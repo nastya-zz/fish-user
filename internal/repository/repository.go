@@ -1,17 +1,20 @@
 package repository
 
-import "user/internal/model"
+import (
+	"context"
+	"user/internal/model"
+)
 
 type UserRepository interface {
-	SaveUser(*model.Profile) error
-	UserProfile(id model.UserId) *model.Profile
-	UpdateProfile(id model.UserId, updateInfo *model.UpdateProfile) *model.Profile
+	SaveUser(ctx context.Context, profile *model.Profile) error
+	UserProfile(ctx context.Context, id model.UserId) *model.Profile
+	UpdateProfile(ctx context.Context, id model.UserId, updateInfo *model.UpdateProfile) *model.Profile
 }
 
 type SettingsRepository interface {
-	Settings(id model.UserId) *model.Settings
+	Settings(ctx context.Context, id model.UserId) *model.Settings
 }
 
 type SubscriptionsRepository interface {
-	Subscriptions(id model.UserId) *model.Subscriptions
+	Subscriptions(ctx context.Context, id model.UserId) *model.Subscriptions
 }

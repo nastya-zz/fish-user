@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"context"
 	"user/internal/client/db"
 	"user/internal/model"
 	"user/internal/repository"
@@ -14,7 +15,7 @@ func NewRepository(db db.Client) repository.SettingsRepository {
 	return &repo{db: db}
 }
 
-func (r repo) Settings(id model.UserId) *model.Settings {
+func (r repo) Settings(ctx context.Context, id model.UserId) *model.Settings {
 	//TODO implement me
 	panic("implement me")
 }

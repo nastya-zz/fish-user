@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	descAuth "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -33,11 +34,13 @@ func NewApp(ctx context.Context) (*App, error) {
 	return a, nil
 }
 
-func (a *App) Run() error {
+func (a *App) Run(ctx context.Context) error {
 	defer func() {
 		closer.CloseAll()
 		closer.Wait()
 	}()
+
+	a.runEventConsumer(ctx)
 
 	return a.runGRPCServer()
 }
@@ -97,4 +100,10 @@ func (a *App) runGRPCServer() error {
 	}
 
 	return nil
+}
+
+func (a *App) runEventConsumer(ctx context.Context) {
+	a.serviceProvider.EventConsumer(ctx)
+	err := a.serviceProvider.eventConsumer.Start(ctx)
+	log.Println(fmt.Errorf("consumer has failed: %w", err))
 }

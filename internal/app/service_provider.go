@@ -4,15 +4,20 @@ import (
 	"context"
 	"log"
 	"user/internal/api/user"
+	"user/internal/client/broker"
+	"user/internal/client/broker/rabbitmq"
 	"user/internal/client/db"
 	"user/internal/client/db/pg"
 	"user/internal/closer"
 	"user/internal/config"
+	"user/internal/consumer"
+	rmqConsumer "user/internal/consumer/rabbitmq"
 	"user/internal/repository"
 	"user/internal/repository/settings"
 	"user/internal/repository/subscriptions"
 	userRepository "user/internal/repository/user"
 	"user/internal/service"
+	"user/internal/service/event"
 	settingsService "user/internal/service/settings"
 	sbService "user/internal/service/subscribtions"
 	userService "user/internal/service/user"
@@ -22,9 +27,13 @@ import (
 type serviceProvider struct {
 	pgConfig   config.PGConfig
 	grpcConfig config.GRPCConfig
+	rmqConfig  config.RMQConfig
 
+	rmqClient broker.ClientMsgBroker
 	dbClient  db.Client
 	txManager db.TxManager
+
+	eventConsumer consumer.Consumer
 
 	userRepository          repository.UserRepository
 	settingsRepository      repository.SettingsRepository
@@ -33,6 +42,7 @@ type serviceProvider struct {
 	userService          service.UserService
 	settingsService      service.SettingsService
 	subscriptionsService service.SubscriptionsService
+	eventService         service.EventsService
 
 	userImpl *user.Implementation
 }
@@ -52,6 +62,19 @@ func (s *serviceProvider) PGConfig() config.PGConfig {
 	}
 
 	return s.pgConfig
+}
+
+func (s *serviceProvider) RMQConfig() config.RMQConfig {
+	if s.rmqConfig == nil {
+		cfg, err := config.NewRMQConfig()
+		if err != nil {
+			log.Fatalf("failed to get rmqConfig : %s", err.Error())
+		}
+
+		s.rmqConfig = cfg
+	}
+
+	return s.rmqConfig
 }
 
 func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
@@ -84,6 +107,21 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	}
 
 	return s.dbClient
+}
+
+func (s *serviceProvider) RabbitMQClient(ctx context.Context) broker.ClientMsgBroker {
+	if s.rmqClient == nil {
+		cl, err := rabbitmq.NewRabbitMQ(ctx, s.RMQConfig().DSN())
+		if err != nil {
+			log.Fatalf("failed to create rmq client: %v", err)
+		}
+
+		closer.Add(cl.Close)
+
+		s.rmqClient = cl
+	}
+
+	return s.rmqClient
 }
 
 func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
@@ -147,13 +185,31 @@ func (s *serviceProvider) SubscriptionsService(ctx context.Context) service.Subs
 	return s.subscriptionsService
 }
 
+func (s *serviceProvider) EventService(ctx context.Context) service.EventsService {
+	if s.eventService == nil {
+		s.eventService = event.New(
+			s.UserService(ctx),
+		)
+	}
+
+	return s.eventService
+}
+
+func (s *serviceProvider) EventConsumer(ctx context.Context) consumer.Consumer {
+	if s.eventConsumer == nil {
+		r := s.RabbitMQClient(ctx)
+		s.eventConsumer = rmqConsumer.NewUserConsumer(r.Connect().Channel, s.EventService(ctx))
+	}
+	return s.eventConsumer
+}
+
 func (s *serviceProvider) AuthImpl(ctx context.Context) *user.Implementation {
 
 	if s.userImpl == nil {
 		s.userImpl = user.NewImplementation(
 			s.UserService(ctx),
-			s.SettingsRepository(ctx),
-			s.SubscriptionsRepository(ctx),
+			s.SettingsService(ctx),
+			s.SubscriptionsService(ctx),
 		)
 	}
 
