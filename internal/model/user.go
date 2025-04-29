@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type UserId string
 
@@ -19,8 +22,20 @@ type Profile struct {
 type UpdateProfile struct {
 	ID         UserId
 	Name       string
-	Email      string
 	AvatarPath string
 	Bio        string
 	IsPublic   bool
+}
+
+func (up *UpdateProfile) GetFieldMap(u UpdateProfile) map[string]interface{} {
+	return map[string]interface{}{
+		"Name":       u.Name,
+		"AvatarPath": u.AvatarPath,
+		"Bio":        u.Bio,
+		"IsPublic":   u.IsPublic,
+	}
+}
+
+func GetUuid(id UserId) (uuid.UUID, error) {
+	return uuid.Parse(string(id))
 }

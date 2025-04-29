@@ -1,7 +1,6 @@
 package user
 
 import (
-	"context"
 	"user/internal/client/db"
 	"user/internal/model"
 	"user/internal/repository"
@@ -21,20 +20,6 @@ func NewService(
 		userRepository: userRepository,
 		txManager:      txManager,
 	}
-}
-
-func (s serv) SaveUser(ctx context.Context, profile *model.Profile) error {
-	return s.userRepository.SaveUser(ctx, profile)
-}
-
-func (s serv) UserProfile(id model.UserId) *model.Profile {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s serv) UpdateProfile(id model.UserId, updateInfo *model.UpdateProfile) *model.Profile {
-	//TODO implement me
-	panic("implement me")
 }
 
 func (s serv) Settings(id model.UserId) *model.Settings {

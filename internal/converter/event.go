@@ -2,6 +2,7 @@ package converter
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"log"
 	"user/internal/model"
 )
@@ -16,8 +17,9 @@ func UserFromPayload(bs []byte) model.Profile {
 		return model.Profile{}
 	}
 
+	id, _ := uuid.Parse(payload.ID)
 	return model.Profile{
-		ID:         model.UserId(payload.ID),
+		ID:         model.UserId(id.String()),
 		Name:       payload.Name,
 		Email:      payload.Email,
 		IsVerified: payload.IsVerified,

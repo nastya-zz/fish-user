@@ -203,7 +203,7 @@ func (s *serviceProvider) EventConsumer(ctx context.Context) consumer.Consumer {
 	return s.eventConsumer
 }
 
-func (s *serviceProvider) AuthImpl(ctx context.Context) *user.Implementation {
+func (s *serviceProvider) UserImpl(ctx context.Context) *user.Implementation {
 
 	if s.userImpl == nil {
 		s.userImpl = user.NewImplementation(

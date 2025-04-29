@@ -7,8 +7,8 @@ import (
 
 type UserService interface {
 	SaveUser(context.Context, *model.Profile) error
-	UserProfile(id model.UserId) *model.Profile
-	UpdateProfile(id model.UserId, updateInfo *model.UpdateProfile) *model.Profile
+	UserProfile(ctx context.Context, id model.UserId) (*model.Profile, error)
+	UpdateProfile(ctx context.Context, updateInfo *model.UpdateProfile) (*model.Profile, error)
 }
 
 type SettingsService interface {

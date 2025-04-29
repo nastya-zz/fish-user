@@ -7,8 +7,8 @@ import (
 
 type UserRepository interface {
 	SaveUser(ctx context.Context, profile *model.Profile) error
-	UserProfile(ctx context.Context, id model.UserId) *model.Profile
-	UpdateProfile(ctx context.Context, id model.UserId, updateInfo *model.UpdateProfile) *model.Profile
+	UserProfile(ctx context.Context, id model.UserId) (*model.Profile, error)
+	UpdateProfile(ctx context.Context, updateInfo *model.UpdateProfile) (*model.Profile, error)
 }
 
 type SettingsRepository interface {
@@ -17,4 +17,10 @@ type SettingsRepository interface {
 
 type SubscriptionsRepository interface {
 	Subscriptions(ctx context.Context, id model.UserId) *model.Subscriptions
+}
+
+type EventRepository interface {
+	GetNewEvent(ctx context.Context) (*model.Event, error)
+	SaveEvent(ctx context.Context, event *model.Event) error
+	SetDone(ctx context.Context, id int) error
 }

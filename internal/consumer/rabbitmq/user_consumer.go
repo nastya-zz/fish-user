@@ -30,7 +30,8 @@ func NewUserConsumer(ch *amqp.Channel, processor service.EventsService) consumer
 	}
 }
 
-func (u UserConsumer) Start(ctx context.Context) error {
+// TODO: решить вопрос с обработкой ошибок, паники
+func (u UserConsumer) Start(ctx context.Context) {
 	messages, err := u.ch.Consume(queueName, "", true, false, false, false, nil)
 	if err != nil {
 		panic(err)
@@ -38,24 +39,26 @@ func (u UserConsumer) Start(ctx context.Context) error {
 
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
-
-	for {
-		select {
-		case <-ctx.Done():
-			log.Println("stopping event consumer")
-			return nil
-		case message := <-messages:
-			log.Printf("Message: %s\n", message.Body)
-			e := event(message.Body)
-			err = u.processor.Process(ctx, *e)
-			if err != nil || e == nil {
-				return err
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				log.Println("stopping event consumer by ctx")
+				return
+			case message := <-messages:
+				log.Printf("Message: %s\n", message.Body)
+				e := event(message.Body)
+				err = u.processor.Process(ctx, *e)
+				if err != nil || e == nil {
+					log.Printf("err: %s\n", err)
+					log.Printf("err: %s\n", e)
+				}
+			case <-sigchan:
+				log.Println("Interrupt detected!")
+				os.Exit(0)
 			}
-		case <-sigchan:
-			log.Println("Interrupt detected!")
-			os.Exit(0)
 		}
-	}
+	}()
 }
 
 func event(msg []byte) *model.Event {
