@@ -36,6 +36,6 @@ func (up *UpdateProfile) GetFieldMap(u UpdateProfile) map[string]interface{} {
 	}
 }
 
-func GetUuid(id UserId) (uuid.UUID, error) {
+func GetUuid[T ~string](id T) (uuid.UUID, error) {
 	return uuid.Parse(string(id))
 }

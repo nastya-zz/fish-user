@@ -158,6 +158,7 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
 		s.userService = userService.NewService(
 			s.UserRepository(ctx),
+			s.SettingsService(ctx),
 			s.TxManager(ctx),
 		)
 	}

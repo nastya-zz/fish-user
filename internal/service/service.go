@@ -6,13 +6,16 @@ import (
 )
 
 type UserService interface {
-	SaveUser(context.Context, *model.Profile) error
+	SaveUser(context.Context, *model.Profile) (model.UserId, error)
 	UserProfile(ctx context.Context, id model.UserId) (*model.Profile, error)
 	UpdateProfile(ctx context.Context, updateInfo *model.UpdateProfile) (*model.Profile, error)
 }
 
 type SettingsService interface {
-	Settings(id model.UserId) *model.Settings
+	Create(ctx context.Context, id model.UserId) (model.UserId, error)
+	Get(ctx context.Context, id model.UserId) (*model.Settings, error)
+	Update(ctx context.Context, id model.UserId, settings *model.Settings) (*model.Settings, error)
+	Reset(ctx context.Context, id model.UserId) (*model.Settings, error)
 }
 
 type SubscriptionsService interface {

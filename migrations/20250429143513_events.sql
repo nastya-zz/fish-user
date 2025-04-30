@@ -1,5 +1,4 @@
--- +goose Up
--- +goose StatementBegin
+
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE events (
@@ -14,11 +13,4 @@ CREATE TABLE events (
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE events;
--- +goose StatementEnd
-
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-SELECT 'down SQL query';
 -- +goose StatementEnd

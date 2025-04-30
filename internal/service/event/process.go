@@ -14,7 +14,8 @@ func (p Processor) Process(ctx context.Context, event model.Event) error {
 	switch event.Type {
 	case model.UserCreate:
 		user := converter.UserFromPayload(event.Payload)
-		return p.userService.SaveUser(ctx, &user)
+		_, err := p.userService.SaveUser(ctx, &user)
+		return err
 	default:
 		return fmt.Errorf("can't process message %w", ErrUnknownEventType)
 	}
