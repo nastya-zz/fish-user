@@ -12,16 +12,20 @@ import (
 func (i *Implementation) UpdateProfile(ctx context.Context, req *desc.UpdateProfileRequest) (*desc.UpdateProfileResponse, error) {
 	info := req.GetInfo()
 
-	profile, err := i.userService.UpdateProfile(ctx, mapping(info))
+	if len(info.GetId()) == 0 {
+		return nil, status.Error(codes.FailedPrecondition, "User ID empty")
+	}
+
+	profile, err := i.userService.UpdateProfile(ctx, mappingUpdateProfile(info))
+
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Cannot update profile")
 	}
 
 	return &desc.UpdateProfileResponse{Profile: converter.ToDescProfileFromProfile(*profile)}, nil
-
 }
 
-func mapping(info *desc.UpdateProfile) *model.UpdateProfile {
+func mappingUpdateProfile(info *desc.UpdateProfile) *model.UpdateProfile {
 	return &model.UpdateProfile{
 		ID:         model.UserId(info.GetId()),
 		Name:       info.Name.Value,
