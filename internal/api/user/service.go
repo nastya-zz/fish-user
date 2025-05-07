@@ -23,6 +23,3 @@ func NewImplementation(
 		subscriptionsService: subscriptionsService,
 	}
 }
-
-//func (UnimplementedUserV1Server) GetSubscriptions(context.Context, *GetSubscriptionsRequest) (*GetSubscriptionsResponse, error) {
-//	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptions not implemented")

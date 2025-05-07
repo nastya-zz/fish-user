@@ -12,7 +12,11 @@ import (
 
 func (r repo) SaveUser(ctx context.Context, profile *model.Profile) (model.UserId, error) {
 	const op = "user.SaveProfile"
+
 	uuId, err := model.GetUuid(profile.ID)
+	if err != nil {
+		return model.UserId(""), err
+	}
 
 	builder := sq.Insert(tableName).
 		PlaceholderFormat(sq.Dollar).

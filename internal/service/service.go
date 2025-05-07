@@ -19,7 +19,9 @@ type SettingsService interface {
 }
 
 type SubscriptionsService interface {
-	Subscriptions(id model.UserId) *model.Subscriptions
+	Subscriptions(ctx context.Context, id model.UserId) (*model.Subscriptions, error)
+	Subscribe(ctx context.Context, id model.UserId, subscriptionId model.UserId) error
+	Unsubscribe(ctx context.Context, id model.UserId, subscriptionId model.UserId) error
 }
 
 type EventsService interface {

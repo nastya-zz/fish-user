@@ -1,12 +1,12 @@
 package model
 
 type Subscription struct {
-	ID         UserId
-	Name       string
-	AvatarPath string
+	ID         UserId `db:"id"`
+	Name       string `db:"username"`
+	AvatarPath string `db:"avatar_path"`
 }
 
 type Subscriptions struct {
-	Followers   []Subscription
-	Subscribers []Subscription
+	Subscribers   []Subscription
+	Subscriptions []Subscription
 }
