@@ -136,6 +136,6 @@ func (r repo) Reset(ctx context.Context, id model.UserId) (*model.Settings, erro
 
 	log.Printf("Reset user %s", op)
 
-	defaultSettings := &model.Settings{}
-	return r.Update(ctx, id, defaultSettings)
+	defaultSettings := model.NewDefaultSettings()
+	return r.Update(ctx, id, &defaultSettings)
 }
