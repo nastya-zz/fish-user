@@ -4,6 +4,19 @@ volumes:
   postgres_volume:
 
 services:
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "${MINIO_PORT}:9000"  # API порт
+      - "${MINIO_UI_PORT}:9001"  # Web интерфейс (консоль управления)
+    volumes:
+      - /Users/nastya/Documents/GitHub/fish-services/minio_data:/data  # Хранилище данных (можно заменить на свой путь)
+    environment:
+      - "MINIO_ROOT_USER=${MINIO_ROOT_USER}"  # Логин (измените на свой)
+      - "MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}"  # Пароль (обязательно измените!)
+    command: server /data --console-address ":9001"  # Запуск сервера с консолью
+    #restart: unless-stopped  # Автоматический перезапуск
   pg:
     image: postgres:14-alpine3.17
     environment:

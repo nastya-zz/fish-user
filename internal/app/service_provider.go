@@ -8,6 +8,7 @@ import (
 	"user/internal/client/broker/rabbitmq"
 	"user/internal/client/db"
 	"user/internal/client/db/pg"
+	"user/internal/client/minio/minio"
 	"user/internal/closer"
 	"user/internal/config"
 	"user/internal/consumer"
@@ -25,13 +26,15 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig   config.PGConfig
-	grpcConfig config.GRPCConfig
-	rmqConfig  config.RMQConfig
+	pgConfig    config.PGConfig
+	grpcConfig  config.GRPCConfig
+	rmqConfig   config.RMQConfig
+	minioConfig *config.MinioConfig
 
-	rmqClient broker.ClientMsgBroker
-	dbClient  db.Client
-	txManager db.TxManager
+	rmqClient   broker.ClientMsgBroker
+	dbClient    db.Client
+	txManager   db.TxManager
+	minioClient *minio.Client
 
 	eventConsumer consumer.Consumer
 
@@ -90,6 +93,19 @@ func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 	return s.grpcConfig
 }
 
+func (s *serviceProvider) MinioConfig() *config.MinioConfig {
+	if s.minioConfig == nil {
+		cfg, err := config.NewMinioConfig()
+		if err != nil {
+			log.Fatalf("failed to get minio config: %s", err.Error())
+		}
+
+		s.minioConfig = cfg
+	}
+
+	return s.minioConfig
+}
+
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
 		cl, err := pg.New(ctx, s.PGConfig().DSN())
@@ -122,6 +138,19 @@ func (s *serviceProvider) RabbitMQClient(ctx context.Context) broker.ClientMsgBr
 	}
 
 	return s.rmqClient
+}
+
+func (s *serviceProvider) MinioClient(ctx context.Context) *minio.Client {
+	if s.rmqClient == nil {
+		cl, err := minio.New(ctx, s.minioConfig.Endpoint, s.minioConfig.AccessKey, s.minioConfig.SecretKey)
+		if err != nil {
+			log.Fatalf("failed to create minio client: %v", err)
+		}
+
+		s.minioClient = cl
+	}
+
+	return s.minioClient
 }
 
 func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
