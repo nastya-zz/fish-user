@@ -141,8 +141,9 @@ func (s *serviceProvider) RabbitMQClient(ctx context.Context) broker.ClientMsgBr
 }
 
 func (s *serviceProvider) MinioClient(ctx context.Context) *minio.Client {
-	if s.rmqClient == nil {
-		cl, err := minio.New(ctx, s.minioConfig.Endpoint, s.minioConfig.AccessKey, s.minioConfig.SecretKey)
+	if s.minioClient == nil {
+		cfg := s.MinioConfig()
+		cl, err := minio.New(ctx, cfg.Endpoint, cfg.AccessKey, cfg.SecretKey)
 		if err != nil {
 			log.Fatalf("failed to create minio client: %v", err)
 		}
@@ -189,6 +190,7 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 			s.UserRepository(ctx),
 			s.SettingsService(ctx),
 			s.TxManager(ctx),
+			s.MinioClient(ctx),
 		)
 	}
 

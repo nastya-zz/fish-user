@@ -18,7 +18,7 @@ func (r repo) UpdateProfile(ctx context.Context, updateUser *model.UpdateProfile
 	log.Printf("updating user %+v", updateUser)
 	uuId, err := model.GetUuid(updateUser.ID)
 
-	returning := fmt.Sprintf("RETURNING %s, %s, %s, %s, %s, %s, %s ", idColumn, nameColumn, emailColumn, isPublicColumn, createdAtColumn, experienceLevelColumn, isVerifiedColumn)
+	returning := fmt.Sprintf("RETURNING %s, %s, %s, %s, %s, %s, %s, %s ", idColumn, nameColumn, emailColumn, isPublicColumn, createdAtColumn, experienceLevelColumn, isVerifiedColumn, avatarPathColumn)
 	builder := sq.Update(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Set(updatedAtColumn, time.Now()).
@@ -44,7 +44,7 @@ func (r repo) UpdateProfile(ctx context.Context, updateUser *model.UpdateProfile
 		QueryRaw: query,
 	}
 	var profile model.Profile
-	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&profile.ID, &profile.Name, &profile.Email, &profile.IsPublic, &profile.CreatedAt, &profile.ExperienceLevel, &profile.IsVerified)
+	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&profile.ID, &profile.Name, &profile.Email, &profile.IsPublic, &profile.CreatedAt, &profile.ExperienceLevel, &profile.IsVerified, &profile.AvatarPath)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.Printf("error in update user with id: %s %+v", err, profile)
 

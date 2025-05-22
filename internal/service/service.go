@@ -9,6 +9,7 @@ type UserService interface {
 	SaveUser(context.Context, *model.Profile) (model.UserId, error)
 	UserProfile(ctx context.Context, id model.UserId) (*model.Profile, error)
 	UpdateProfile(ctx context.Context, updateInfo *model.UpdateProfile) (*model.Profile, error)
+	UploadAvatar(ctx context.Context, file []byte, name string) (string, error)
 }
 
 type SettingsService interface {

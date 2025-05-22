@@ -3,20 +3,21 @@ package minio
 import (
 	"context"
 	"fmt"
-	"github.com/minio/minio-go/v7"
+	miniolib "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 type Client struct {
-	client     *minio.Client
-	bucketName string
+	Client     *miniolib.Client
+	BucketName string
+	endpoint   string
 }
 
 const bucketName = "user-service"
 
 func New(ctx context.Context, endpoint, accessKeyID, secretAccessKey string) (*Client, error) {
 
-	minioClient, err := minio.New(endpoint, &minio.Options{
+	minioClient, err := miniolib.New(endpoint, &miniolib.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: false,
 	})
@@ -27,11 +28,16 @@ func New(ctx context.Context, endpoint, accessKeyID, secretAccessKey string) (*C
 
 	exists, errBucketExists := minioClient.BucketExists(ctx, bucketName)
 	if errBucketExists != nil && !exists {
-		return nil, fmt.Errorf("произошла ошибка при  проверке бакета %w", err)
+		return nil, fmt.Errorf("произошла ошибка при  проверке бакета %s %w", bucketName, err)
 	}
 
 	return &Client{
-		client:     minioClient,
-		bucketName: bucketName,
+		Client:     minioClient,
+		BucketName: bucketName,
+		endpoint:   endpoint,
 	}, err
+}
+
+func (m Client) SourcePrefix() string {
+	return fmt.Sprintf("%s/%s/", m.endpoint, m.BucketName)
 }
