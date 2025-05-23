@@ -19,6 +19,7 @@ import (
 	userRepository "user/internal/repository/user"
 	"user/internal/service"
 	"user/internal/service/event"
+	mino_service "user/internal/service/minio"
 	settingsService "user/internal/service/settings"
 	sbService "user/internal/service/subscribtions"
 	userService "user/internal/service/user"
@@ -46,6 +47,7 @@ type serviceProvider struct {
 	settingsService      service.SettingsService
 	subscriptionsService service.SubscriptionsService
 	eventService         service.EventsService
+	minioService         service.MinioService
 
 	userImpl *user.Implementation
 }
@@ -184,13 +186,23 @@ func (s *serviceProvider) SubscriptionsRepository(ctx context.Context) repositor
 	return s.subscriptionsRepository
 }
 
+func (s *serviceProvider) MinioService(ctx context.Context) service.MinioService {
+	if s.minioService == nil {
+		s.minioService = mino_service.New(
+			s.MinioClient(ctx),
+		)
+	}
+
+	return s.minioService
+}
+
 func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
 		s.userService = userService.NewService(
 			s.UserRepository(ctx),
 			s.SettingsService(ctx),
 			s.TxManager(ctx),
-			s.MinioClient(ctx),
+			s.MinioService(ctx),
 		)
 	}
 

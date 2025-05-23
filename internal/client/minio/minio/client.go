@@ -39,5 +39,5 @@ func New(ctx context.Context, endpoint, accessKeyID, secretAccessKey string) (*C
 }
 
 func (m Client) SourcePrefix() string {
-	return fmt.Sprintf("%s/%s/", m.endpoint, m.BucketName)
+	return fmt.Sprintf("%s/", m.BucketName)
 }

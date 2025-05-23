@@ -17,7 +17,7 @@ func (r repo) UserProfile(ctx context.Context, id model.UserId) (*model.Profile,
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
-	builder := sq.Select(idColumn, nameColumn, emailColumn, isPublicColumn, createdAtColumn, experienceLevelColumn, isVerifiedColumn).
+	builder := sq.Select(idColumn, nameColumn, emailColumn, isPublicColumn, createdAtColumn, experienceLevelColumn, isVerifiedColumn, avatarPathColumn).
 		PlaceholderFormat(sq.Dollar).
 		From(tableName).
 		Where(sq.Eq{idColumn: uuId}).
@@ -34,7 +34,7 @@ func (r repo) UserProfile(ctx context.Context, id model.UserId) (*model.Profile,
 	}
 
 	var profile model.Profile
-	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&profile.ID, &profile.Name, &profile.Email, &profile.IsPublic, &profile.CreatedAt, &profile.ExperienceLevel, &profile.IsVerified)
+	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&profile.ID, &profile.Name, &profile.Email, &profile.IsPublic, &profile.CreatedAt, &profile.ExperienceLevel, &profile.IsVerified, &profile.AvatarPath)
 	if err != nil {
 		log.Println(fmt.Errorf("error in get profile user %w", err))
 		return nil, fmt.Errorf("error in get profile user %w", err)

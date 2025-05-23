@@ -5,6 +5,7 @@ import (
 	desc "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"user/internal/model"
 )
 
 func (i *Implementation) UploadAvatar(ctx context.Context, req *desc.UploadAvatarRequest) (*desc.UploadAvatarResponse, error) {
@@ -18,7 +19,12 @@ func (i *Implementation) UploadAvatar(ctx context.Context, req *desc.UploadAvata
 		return nil, status.Error(codes.InvalidArgument, "filename is empty")
 	}
 
-	res, err := i.userService.UploadAvatar(ctx, fileBytes, filename)
+	userId := req.GetUserId()
+	if len(filename) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "filename is empty")
+	}
+
+	res, err := i.userService.UploadAvatar(ctx, fileBytes, filename, model.UserId(userId))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

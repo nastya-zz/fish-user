@@ -10,7 +10,7 @@ require (
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/joho/godotenv v1.5.1
 	github.com/minio/minio-go/v7 v7.0.92
-	github.com/nastya-zz/fisher-protocols v0.0.8
+	github.com/nastya-zz/fisher-protocols v0.0.10
 	github.com/pkg/errors v0.9.1
 	github.com/rabbitmq/amqp091-go v1.10.0
 	google.golang.org/grpc v1.72.0
