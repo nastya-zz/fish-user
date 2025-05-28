@@ -27,10 +27,11 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig    config.PGConfig
-	grpcConfig  config.GRPCConfig
-	rmqConfig   config.RMQConfig
-	minioConfig *config.MinioConfig
+	loggerConfig config.LoggerConfig
+	pgConfig     config.PGConfig
+	grpcConfig   config.GRPCConfig
+	rmqConfig    config.RMQConfig
+	minioConfig  *config.MinioConfig
 
 	rmqClient   broker.ClientMsgBroker
 	dbClient    db.Client
@@ -54,6 +55,18 @@ type serviceProvider struct {
 
 func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
+}
+
+func (s *serviceProvider) LoggerConfig() config.LoggerConfig {
+	if s.loggerConfig == nil {
+		cfg, err := config.NewLoggerConfig()
+		if err != nil {
+			log.Fatalf("failed to get pg config: %s", err.Error())
+		}
+
+		s.loggerConfig = cfg
+	}
+	return s.loggerConfig
 }
 
 func (s *serviceProvider) PGConfig() config.PGConfig {

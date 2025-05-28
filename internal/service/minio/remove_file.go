@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/minio/minio-go/v7"
-	"log"
 	"strings"
+	"user/internal/logger"
 )
 
 func (s Service) RemoveFile(ctx context.Context, link string) error {
+	const op = "service.minio.RemoveFile"
 	fileName, err := s.getFileName(link)
 	if err != nil {
 		return err
@@ -19,7 +20,7 @@ func (s Service) RemoveFile(ctx context.Context, link string) error {
 		return fmt.Errorf("не удалось удалить объект: %v", err)
 	}
 
-	log.Printf("Файл %s успешно удален из бакета, имя файла: %s", s.minioClient.BucketName, fileName)
+	logger.Info(op, "Файл успешно удален", "бакет", s.minioClient.BucketName, "имя файла", fileName)
 	return nil
 }
 

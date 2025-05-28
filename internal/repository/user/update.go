@@ -6,19 +6,19 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
-	"log"
 	"time"
 	"user/internal/client/db"
+	"user/internal/logger"
 	"user/internal/model"
 )
 
 func (r repo) UpdateProfile(ctx context.Context, updateUser *model.UpdateProfile) (*model.Profile, error) {
 	const op = "user.UpdateProfile"
 
-	log.Printf("updating user %+v", updateUser)
+	logger.Info(op, "updating user", updateUser)
 	uuId, err := model.GetUuid(updateUser.ID)
 
-	returning := fmt.Sprintf("RETURNING %s, %s, %s, %s, %s, %s, %s, %s ", idColumn, nameColumn, emailColumn, isPublicColumn, createdAtColumn, experienceLevelColumn, isVerifiedColumn, avatarPathColumn)
+	returning := fmt.Sprintf("RETURNING %s, %s, %s, %s, %s, %s, %s, %s, %s ", idColumn, nameColumn, emailColumn, isPublicColumn, createdAtColumn, experienceLevelColumn, isVerifiedColumn, avatarPathColumn, bioColumn)
 	builder := sq.Update(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Set(updatedAtColumn, time.Now()).
@@ -44,17 +44,17 @@ func (r repo) UpdateProfile(ctx context.Context, updateUser *model.UpdateProfile
 		QueryRaw: query,
 	}
 	var profile model.Profile
-	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&profile.ID, &profile.Name, &profile.Email, &profile.IsPublic, &profile.CreatedAt, &profile.ExperienceLevel, &profile.IsVerified, &profile.AvatarPath)
+	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&profile.ID, &profile.Name, &profile.Email, &profile.IsPublic, &profile.CreatedAt, &profile.ExperienceLevel, &profile.IsVerified, &profile.AvatarPath, &profile.Bio)
 	if errors.Is(err, pgx.ErrNoRows) {
-		log.Printf("error in update user with id: %s %+v", err, profile)
+		logger.Warn("error in update user with id ", "err", err, "profile", profile)
 
 		return nil, fmt.Errorf("cannot update user with id: %s", updateUser.ID)
 	}
 	if err != nil {
-		log.Printf("error in update user with id: %s", err)
+		logger.Warn("error in update user with id:", "err", err)
 		return nil, fmt.Errorf("cannot update user %w", err)
 	}
 
-	log.Printf("updating user %+v", updateUser)
+	logger.Info(op, "updating user ", profile)
 	return &profile, nil
 }

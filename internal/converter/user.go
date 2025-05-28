@@ -6,7 +6,7 @@ import (
 	"user/internal/model"
 )
 
-func ToDescProfileFromProfile(profile model.Profile) *desc.UserProfile {
+func ToDescProfileFromProfile(profile *model.Profile) *desc.UserProfile {
 	return &desc.UserProfile{
 		Id:              string(profile.ID),
 		Email:           profile.Email,

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
-	"log"
 	"user/internal/client/db"
+	"user/internal/logger"
 	"user/internal/model"
 	"user/internal/repository"
 )
@@ -99,7 +99,7 @@ func (r repo) SaveEvent(ctx context.Context, event *model.Event) error {
 	var savedId int
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&savedId)
 	if err != nil {
-		log.Println(err)
+		logger.Warn(op, "error", fmt.Errorf("error in create event %w", err))
 		return fmt.Errorf("error in create event %w", err)
 	}
 
@@ -108,7 +108,7 @@ func (r repo) SaveEvent(ctx context.Context, event *model.Event) error {
 
 func (r repo) SetDone(ctx context.Context, id int) error {
 	const op = "db.SetDone"
-	log.Printf("updating event %+v", id)
+	logger.Info(op, "updating event ", id)
 
 	builder := sq.Update(tableName).
 		PlaceholderFormat(sq.Dollar).
@@ -129,12 +129,12 @@ func (r repo) SetDone(ctx context.Context, id int) error {
 	var savedId int
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&savedId)
 	if errors.Is(err, pgx.ErrNoRows) {
-		log.Printf("error in update event with id: %s %d", err, savedId)
+		logger.Warn("error in update event with id: ", "err", err, "savedId", savedId)
 
 		return fmt.Errorf("cannot update event with id: %d", savedId)
 	}
 	if err != nil {
-		log.Printf("error in update event with id: %s", err)
+		logger.Warn("error in update event with id: ", "err", err)
 		return fmt.Errorf("cannot update event %w", err)
 	}
 

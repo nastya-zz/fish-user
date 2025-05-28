@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"log"
 	"path/filepath"
+	"user/internal/logger"
 	"user/internal/model"
 )
 
@@ -42,6 +42,6 @@ func (s serv) oldAvatarLink(ctx context.Context, userId model.UserId) (string, e
 		return "", fmt.Errorf("cannot chexk user profile %s, %w", op, err)
 	}
 
-	log.Printf("userProfile.AvatarPath old link: %s", userProfile.AvatarPath)
+	logger.Info(op, "userProfile.AvatarPath old link: ", userProfile.AvatarPath)
 	return userProfile.AvatarPath, nil
 }

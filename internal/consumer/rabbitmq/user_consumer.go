@@ -5,11 +5,11 @@ import (
 	"context"
 	"encoding/gob"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"user/internal/consumer"
+	"user/internal/logger"
 	"user/internal/model"
 	"user/internal/service"
 )
@@ -32,6 +32,7 @@ func NewUserConsumer(ch *amqp.Channel, processor service.EventsService) consumer
 
 // TODO: решить вопрос с обработкой ошибок, паники
 func (u UserConsumer) Start(ctx context.Context) {
+	const op = "rabbitmq.Start"
 	messages, err := u.ch.Consume(queueName, "", true, false, false, false, nil)
 	if err != nil {
 		panic(err)
@@ -43,18 +44,18 @@ func (u UserConsumer) Start(ctx context.Context) {
 		for {
 			select {
 			case <-ctx.Done():
-				log.Println("stopping event consumer by ctx")
+				logger.Info("stopping event consumer by ctx")
 				return
 			case message := <-messages:
-				log.Printf("Message: %s\n", message.Body)
+				logger.Info("Message: %s\n", message.Body)
 				e := event(message.Body)
 				err = u.processor.Process(ctx, *e)
 				if err != nil || e == nil {
-					log.Printf("err: %s\n", err)
-					log.Printf("err: %s\n", e)
+					logger.Warn(op, "err: %s\n", err)
+					logger.Warn(op, "event: %s\n", e)
 				}
 			case <-sigchan:
-				log.Println("Interrupt detected!")
+				logger.Info("Interrupt detected!")
 				os.Exit(0)
 			}
 		}
@@ -69,7 +70,7 @@ func event(msg []byte) *model.Event {
 		return nil
 	}
 
-	log.Println("event:", e)
+	logger.Info("event:", "e", e)
 
 	return &e
 }

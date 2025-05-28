@@ -3,16 +3,17 @@ package converter
 import (
 	"encoding/json"
 	"github.com/google/uuid"
-	"log"
+	"user/internal/logger"
 	"user/internal/model"
 )
 
 // todo refactor
 func UserFromPayload(bs []byte) model.Profile {
+	const op = "converter.UserFromPayload"
 	var payload model.UserPayload
 
 	if err := json.Unmarshal(bs, &payload); err != nil {
-		log.Println(err)
+		logger.Warn(op, "err", err)
 
 		return model.Profile{}
 	}

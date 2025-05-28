@@ -6,8 +6,8 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
-	"log"
 	"user/internal/client/db"
+	"user/internal/logger"
 	"user/internal/model"
 	"user/internal/repository"
 )
@@ -51,7 +51,7 @@ func (r repo) Create(ctx context.Context, id model.UserId, settings model.Settin
 	var userId model.UserId
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&userId)
 	if err != nil {
-		log.Println(err)
+		logger.Warn(op, "err", err)
 
 		if errors.Is(err, pgx.ErrNoRows) {
 			return "", nil
@@ -90,11 +90,11 @@ func (r repo) Get(ctx context.Context, id model.UserId) (*model.Settings, error)
 
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&settings.Language, &settings.Availability)
 	if err != nil {
-		log.Println(fmt.Errorf("error in get settings user %w", err))
+		logger.Warn(fmt.Sprintf("error in get settings user %s", err.Error()))
 		return nil, fmt.Errorf("error in get settings user %w", err)
 	}
 
-	log.Println(op, settings)
+	logger.Info(op, settings)
 	return &settings, nil
 }
 
@@ -124,7 +124,7 @@ func (r repo) Update(ctx context.Context, id model.UserId, settings *model.Setti
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&updatedSettings.Language, &updatedSettings.Availability)
 
 	if err != nil {
-		log.Printf("error in update settings with user id: %s", err)
+		logger.Warn("error in update settings with user id: %s", err)
 		return nil, fmt.Errorf("cannot update settings %w", err)
 	}
 
@@ -132,9 +132,9 @@ func (r repo) Update(ctx context.Context, id model.UserId, settings *model.Setti
 }
 
 func (r repo) Reset(ctx context.Context, id model.UserId) (*model.Settings, error) {
-	const op = "settings.Reset"
+	const op = "repository.settings.Reset"
 
-	log.Printf("Reset user %s", op)
+	logger.Info(op)
 
 	defaultSettings := model.NewDefaultSettings()
 	return r.Update(ctx, id, &defaultSettings)

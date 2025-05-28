@@ -5,8 +5,8 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
-	"log"
 	"user/internal/client/db"
+	"user/internal/logger"
 	"user/internal/model"
 )
 
@@ -28,8 +28,8 @@ func (r repo) Subscriptions(ctx context.Context, id model.UserId) (*model.Subscr
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
-	log.Printf("%s, subscribers: %v", op, subscribers)
-	log.Printf("%s, subscriptions: %v", op, subscriptions)
+	logger.Info(op, "subscribers: ", subscribers)
+	logger.Info(op, "subscriptions: ", subscriptions)
 
 	return &model.Subscriptions{
 		Subscribers:   subscribers,
@@ -68,11 +68,11 @@ func (r repo) getFollowers(ctx context.Context, id uuid.UUID) ([]model.Subscript
 	var sbc []model.Subscription
 
 	if err = r.db.DB().ScanAllContext(ctx, &sbc, q, args...); err != nil {
-		log.Println(fmt.Errorf("error in get sbsc user %w", err))
+		logger.Warn(fmt.Sprintf("error in get sbsc user %w", err))
 		return nil, fmt.Errorf("error in get sbsc user %w", err)
 	}
 
-	log.Println(op, sbc)
+	logger.Info(op, "sbc", sbc)
 	return sbc, nil
 
 }
@@ -107,11 +107,11 @@ func (r repo) getFollowing(ctx context.Context, id uuid.UUID) ([]model.Subscript
 	var sbc []model.Subscription
 
 	if err = r.db.DB().ScanAllContext(ctx, &sbc, q, args...); err != nil {
-		log.Println(fmt.Errorf("error in get sbsc user %w", err))
+		logger.Warn(fmt.Sprintf("error in get sbsc user %s", err.Error()))
 		return nil, fmt.Errorf("error in get sbsc user %w", err)
 	}
 
-	log.Println(op, sbc)
+	logger.Info(op, "sbc", sbc)
 	return sbc, nil
 
 }
