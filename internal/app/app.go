@@ -6,10 +6,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
-	"log"
+	"log/slog"
 	"net"
 	"user/internal/closer"
 	"user/internal/config"
+	"user/internal/logger"
 )
 
 type App struct {
@@ -58,6 +59,9 @@ func (a *App) initDeps(ctx context.Context) error {
 		}
 	}
 
+	a.serviceProvider.LoggerConfig()
+	a.setupLogger()
+
 	return nil
 }
 
@@ -86,7 +90,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 }
 
 func (a *App) runGRPCServer() error {
-	log.Printf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address())
+	logger.Info("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address())
 
 	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Address())
 	if err != nil {
@@ -104,4 +108,19 @@ func (a *App) runGRPCServer() error {
 func (a *App) runEventConsumer(ctx context.Context) {
 	a.serviceProvider.EventConsumer(ctx)
 	a.serviceProvider.eventConsumer.Start(ctx)
+}
+
+func (a *App) setupLogger() {
+	env := a.serviceProvider.loggerConfig.Environment()
+
+	switch env {
+	case envDev:
+		logger.Init(slog.LevelDebug)
+
+	case envProd:
+		logger.Init(slog.LevelInfo)
+
+	default: // If env config is invalid, set prod settings by default due to security
+		logger.Init(slog.LevelInfo)
+	}
 }

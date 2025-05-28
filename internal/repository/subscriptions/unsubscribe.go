@@ -7,8 +7,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
-	"log"
 	"user/internal/client/db"
+	"user/internal/logger"
 	"user/internal/model"
 )
 
@@ -39,14 +39,14 @@ func (r repo) Unsubscribe(ctx context.Context, id model.UserId, subscriptionId m
 	var rowId uuid.UUID
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&rowId)
 	if err != nil {
-		log.Println(err)
+		logger.Warn(op, "err", err)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil
 		}
 		return err
 	}
 
-	log.Printf(" rowId %s, subscriptionId %s,  id %s", rowId, subscriptionId, id)
+	logger.Warn(op, "rowId", rowId, "subscriptionId", subscriptionId, "id", id)
 
 	return nil
 }

@@ -5,11 +5,12 @@ import (
 	desc "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
+	"user/internal/logger"
 	"user/internal/model"
 )
 
 func (i *Implementation) GetSubscriptions(ctx context.Context, req *desc.GetSubscriptionsRequest) (*desc.GetSubscriptionsResponse, error) {
+	const op = "api.GetSubscriptions"
 	id := req.GetId()
 	if len(id) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "missing user id")
@@ -20,7 +21,7 @@ func (i *Implementation) GetSubscriptions(ctx context.Context, req *desc.GetSubs
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	log.Println("subscriptions:", subs)
+	logger.Info(op, "subscriptions:", subs)
 
 	return &desc.GetSubscriptionsResponse{
 		Subscriptions: mapping(subs.Subscriptions),
@@ -30,7 +31,7 @@ func (i *Implementation) GetSubscriptions(ctx context.Context, req *desc.GetSubs
 }
 
 func mapping(sb []model.Subscription) []*desc.SubscriptionUser {
-	log.Printf("mapping %d", len(sb))
+	logger.Debug("mapping %d", len(sb))
 
 	if len(sb) == 0 {
 		return []*desc.SubscriptionUser{}
@@ -45,7 +46,7 @@ func mapping(sb []model.Subscription) []*desc.SubscriptionUser {
 			AvatarPath: element.AvatarPath,
 		})
 	}
-	log.Printf("slice %d", len(slice))
+	logger.Debug("slice %d", len(slice))
 
 	return slice
 }

@@ -5,8 +5,8 @@ import (
 	"errors"
 	sq "github.com/Masterminds/squirrel"
 	pgx "github.com/jackc/pgx/v4"
-	"log"
 	"user/internal/client/db"
+	"user/internal/logger"
 	"user/internal/model"
 )
 
@@ -37,7 +37,7 @@ func (r repo) SaveUser(ctx context.Context, profile *model.Profile) (model.UserI
 	var id model.UserId
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id)
 	if err != nil {
-		log.Println(err)
+		logger.Warn(op, "err", err.Error())
 
 		if errors.Is(err, pgx.ErrNoRows) {
 			return "", nil

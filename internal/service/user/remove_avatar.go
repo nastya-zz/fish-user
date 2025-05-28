@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
-	"log"
+	"user/internal/logger"
 	"user/internal/model"
 )
 
@@ -30,7 +30,7 @@ func (s serv) RemoveAvatar(ctx context.Context, userId model.UserId, filename st
 	}
 
 	if err = s.minio.RemoveFile(ctx, filename); err != nil {
-		log.Print("minio remove file error:", err.Error())
+		logger.Info(op, "minio remove file error:", err.Error())
 	}
 
 	return nil

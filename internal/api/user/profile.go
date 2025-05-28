@@ -23,5 +23,5 @@ func (i *Implementation) GetProfile(ctx context.Context, req *desc.GetProfileReq
 		return nil, status.Error(codes.NotFound, "ID not found")
 	}
 
-	return &desc.GetProfileResponse{Profile: converter.ToDescProfileFromProfile(*profile)}, nil
+	return &desc.GetProfileResponse{Profile: converter.ToDescProfileFromProfile(profile)}, nil
 }
