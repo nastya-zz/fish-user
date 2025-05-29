@@ -22,3 +22,33 @@ func TestGetUserProfile_HappyPath(t *testing.T) {
 	assert.NotEmpty(t, res.GetProfile())
 	assert.Equal(t, res.GetProfile().GetId(), userId)
 }
+
+func TestGetUserProfile_Negative(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	tests := []struct {
+		name        string
+		userId      string
+		expectedErr string
+	}{
+		{
+			name:        "Id empty",
+			userId:      "",
+			expectedErr: "Не указан id пользователя",
+		},
+		{
+			name:        "User not found",
+			userId:      "not-exist-id",
+			expectedErr: "Пользователь с таким Id не найден",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := st.UserClient.GetProfile(ctx, &desc.GetProfileRequest{Id: tt.userId})
+
+			require.Error(t, err)
+			require.Contains(t, err.Error(), tt.expectedErr)
+		})
+	}
+}

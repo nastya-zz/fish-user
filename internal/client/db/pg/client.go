@@ -14,7 +14,7 @@ type pgClient struct {
 
 func New(ctx context.Context, dsn string) (db.Client, error) {
 	dbc, err := pgxpool.Connect(ctx, dsn)
-	log.Println("Connected to ", dsn)
+	log.Println("Connected to database ", dsn)
 	if err != nil {
 		return nil, errors.Errorf("failed to connect to db: %v", err)
 	}

@@ -13,14 +13,14 @@ import (
 func (i *Implementation) GetProfile(ctx context.Context, req *desc.GetProfileRequest) (*desc.GetProfileResponse, error) {
 	id := req.GetId()
 	if id == "" || id == uuid.Nil.String() {
-		return nil, status.Error(codes.InvalidArgument, "id is required")
+		return nil, status.Error(codes.InvalidArgument, "Не указан id пользователя")
 	}
 
 	uId, _ := uuid.Parse(id)
 
 	profile, err := i.userService.UserProfile(ctx, model.UserId(uId.String()))
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "ID not found")
+		return nil, status.Error(codes.NotFound, "Пользователь с таким Id не найден")
 	}
 
 	return &desc.GetProfileResponse{Profile: converter.ToDescProfileFromProfile(profile)}, nil
