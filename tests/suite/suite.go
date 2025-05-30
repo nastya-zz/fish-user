@@ -17,7 +17,7 @@ type Suite struct {
 
 func New(t *testing.T) (context.Context, *Suite) {
 	t.Helper()
-	//t.Parallel()
+	t.Parallel()
 
 	err := config.Load("../../.env")
 	if err != nil {

@@ -5,18 +5,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	_test "user/tests"
 	"user/tests/suite"
 )
 
 func TestGetUserSettings(t *testing.T) {
-	const (
-		userId = "72a9cbbc-0175-4e6c-92dd-98629b6aac41"
-	)
-
 	ctx, st := suite.New(t)
 
 	t.Run("success get settings", func(t *testing.T) {
-		res, err := st.UserClient.GetSettings(ctx, &desc.GetSettingsRequest{Id: userId})
+		res, err := st.UserClient.GetSettings(ctx, &desc.GetSettingsRequest{Id: _test.UserId})
 
 		require.NoError(t, err)
 		settings := res.GetSettings()

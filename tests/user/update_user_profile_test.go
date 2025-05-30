@@ -7,13 +7,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"testing"
+	_test "user/tests"
 	"user/tests/suite"
 )
 
 func TestUpdateUserProfile_Bio(t *testing.T) {
-	const (
-		userId = "72a9cbbc-0175-4e6c-92dd-98629b6aac41"
-	)
 	ctx, st := suite.New(t)
 
 	tests := []struct {
@@ -33,13 +31,13 @@ func TestUpdateUserProfile_Bio(t *testing.T) {
 		},
 	}
 
-	resGetUser, errGet := st.UserClient.GetProfile(ctx, &desc.GetProfileRequest{Id: userId})
+	resGetUser, errGet := st.UserClient.GetProfile(ctx, &desc.GetProfileRequest{Id: _test.UserId})
 	require.NoError(t, errGet)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resUpdUser, err := st.UserClient.UpdateProfile(ctx, &desc.UpdateProfileRequest{Info: &desc.UpdateProfile{
-				Id:         userId,
+				Id:         _test.UserId,
 				Bio:        &wrapperspb.StringValue{Value: tt.bio},
 				AvatarPath: &wrapperspb.StringValue{Value: resGetUser.Profile.AvatarPath},
 				Email:      &wrapperspb.StringValue{Value: resGetUser.Profile.Email},
@@ -63,9 +61,6 @@ func TestUpdateUserProfile_Bio(t *testing.T) {
 }
 
 func TestUpdateUserProfile_Name(t *testing.T) {
-	const (
-		userId = "72a9cbbc-0175-4e6c-92dd-98629b6aac41"
-	)
 	ctx, st := suite.New(t)
 
 	fakeName := gofakeit.Username()
@@ -87,13 +82,13 @@ func TestUpdateUserProfile_Name(t *testing.T) {
 		},
 	}
 
-	resGetUser, errGet := st.UserClient.GetProfile(ctx, &desc.GetProfileRequest{Id: userId})
+	resGetUser, errGet := st.UserClient.GetProfile(ctx, &desc.GetProfileRequest{Id: _test.UserId})
 	require.NoError(t, errGet)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resUpdUser, err := st.UserClient.UpdateProfile(ctx, &desc.UpdateProfileRequest{Info: &desc.UpdateProfile{
-				Id:         userId,
+				Id:         _test.UserId,
 				Bio:        &wrapperspb.StringValue{Value: resGetUser.Profile.Bio},
 				AvatarPath: &wrapperspb.StringValue{Value: resGetUser.Profile.AvatarPath},
 				Email:      &wrapperspb.StringValue{Value: resGetUser.Profile.Email},
@@ -117,9 +112,6 @@ func TestUpdateUserProfile_Name(t *testing.T) {
 }
 
 func TestUpdateUserProfile_Email_Negative(t *testing.T) {
-	const (
-		userId = "72a9cbbc-0175-4e6c-92dd-98629b6aac41"
-	)
 	ctx, st := suite.New(t)
 
 	tests := []struct {
@@ -139,13 +131,13 @@ func TestUpdateUserProfile_Email_Negative(t *testing.T) {
 		},
 	}
 
-	resGetUser, errGet := st.UserClient.GetProfile(ctx, &desc.GetProfileRequest{Id: userId})
+	resGetUser, errGet := st.UserClient.GetProfile(ctx, &desc.GetProfileRequest{Id: _test.UserId})
 	require.NoError(t, errGet)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := st.UserClient.UpdateProfile(ctx, &desc.UpdateProfileRequest{Info: &desc.UpdateProfile{
-				Id:         userId,
+				Id:         _test.UserId,
 				Bio:        &wrapperspb.StringValue{Value: resGetUser.Profile.Bio},
 				AvatarPath: &wrapperspb.StringValue{Value: resGetUser.Profile.AvatarPath},
 				Name:       &wrapperspb.StringValue{Value: resGetUser.Profile.Name},

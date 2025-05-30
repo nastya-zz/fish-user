@@ -2,7 +2,7 @@ package model
 
 const (
 	LangRu = "RU"
-	LangEn = "EN"
+	LangEn = "ENG"
 )
 
 const (

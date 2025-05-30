@@ -40,7 +40,7 @@ func (a *App) Run(ctx context.Context) error {
 		closer.Wait()
 	}()
 
-	//a.runEventConsumer(ctx)
+	a.runEventConsumer(ctx)
 
 	return a.runGRPCServer()
 }

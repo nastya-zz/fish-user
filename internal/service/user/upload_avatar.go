@@ -15,7 +15,7 @@ func (s serv) UploadAvatar(ctx context.Context, file []byte, name string, userId
 	ext := filepath.Ext(name)
 
 	nameId := uuid.NewString()
-	uniqUuidName := fmt.Sprintf("%s%s", nameId, ext)
+	uniqUuidName := fmt.Sprintf("%s-%s%s", userId, nameId, ext)
 
 	link, err := s.minio.UploadFile(ctx, file, uniqUuidName)
 

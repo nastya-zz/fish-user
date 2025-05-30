@@ -12,13 +12,14 @@ import (
 func (i *Implementation) UpdateSettings(ctx context.Context, req *desc.UpdateSettingsRequest) (*desc.UpdateSettingsResponse, error) {
 	userId := req.GetUserId()
 	if len(userId) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "missing user id")
+		return nil, status.Error(codes.InvalidArgument, "user id is required")
+	}
+
+	if req.GetSettingsInfo() == nil {
+		return nil, status.Error(codes.InvalidArgument, "missing user settings")
 	}
 
 	setInfo := mappingSettings(req.GetSettingsInfo())
-	if setInfo == nil {
-		return nil, status.Error(codes.InvalidArgument, "missing user settings")
-	}
 
 	updated, err := i.settingsService.Update(ctx, model.UserId(userId), setInfo)
 	if err != nil {
