@@ -2,6 +2,7 @@ package subscribtions
 
 import (
 	"context"
+	"fmt"
 	"user/internal/client/db"
 	"user/internal/model"
 	"user/internal/repository"
@@ -28,6 +29,15 @@ func (s serv) Subscriptions(ctx context.Context, id model.UserId) (*model.Subscr
 }
 
 func (s serv) Subscribe(ctx context.Context, id model.UserId, subscriptionId model.UserId) error {
+	exists, err := s.subscriptionsRepository.SubscriptionExists(ctx, id, subscriptionId)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return fmt.Errorf("subscription already exists")
+	}
+
 	return s.subscriptionsRepository.Subscribe(ctx, id, subscriptionId)
 }
 

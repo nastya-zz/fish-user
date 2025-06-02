@@ -22,6 +22,7 @@ type SubscriptionsRepository interface {
 	Subscriptions(ctx context.Context, id model.UserId) (*model.Subscriptions, error)
 	Subscribe(ctx context.Context, id model.UserId, subscriptionId model.UserId) error
 	Unsubscribe(ctx context.Context, id model.UserId, subscriptionId model.UserId) error
+	SubscriptionExists(ctx context.Context, id model.UserId, subscriptionId model.UserId) (bool, error)
 }
 
 type EventRepository interface {

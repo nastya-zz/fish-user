@@ -22,9 +22,12 @@ func (r repo) Unsubscribe(ctx context.Context, id model.UserId, subscriptionId m
 	}
 
 	builder := sq.Delete(TableFollowsName).
-		Where(sq.Eq{FollowerIdColumn: userId, FollowingIdColumn: subsId}).
-		Limit(1).
-		Suffix("RETURNING id")
+		Where(sq.And{
+			sq.Eq{FollowerIdColumn: userId},
+			sq.Eq{FollowingIdColumn: subsId},
+		}).
+		Suffix("RETURNING id").
+		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
