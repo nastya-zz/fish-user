@@ -1,0 +1,21 @@
+- id: RAW=uuid_generate_v4()
+  username: Alan
+  email: test@test.com
+  avatar_path: ""
+  bio: Some bio
+  is_verified: false
+  is_public: true
+  experience_level: 1
+  created_at: 2020-12-31 23:59:59
+  updated_at: 2020-12-31 23:59:59
+
+- id: RAW=uuid_generate_v4()
+  username: Bob
+  email: bob@test.com
+  avatar_path: ""
+  bio: Some bio of BOB
+  is_verified: false
+  is_public: true
+  experience_level: 1
+  created_at: 2020-12-31 23:59:59
+  updated_at: 2020-12-31 23:59:59

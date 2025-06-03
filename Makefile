@@ -8,3 +8,7 @@ generate:
 
 generate-migration:
 	./bin/goose create ____ sql
+
+up-test-env:
+	docker-compose -f docker-compose.test.yaml --env-file .env.test up -d --build
+

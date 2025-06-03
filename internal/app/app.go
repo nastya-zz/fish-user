@@ -19,6 +19,7 @@ type App struct {
 }
 
 const (
+	envTest = "test"
 	envDev  = "dev"
 	envProd = "prod"
 )
@@ -66,7 +67,7 @@ func (a *App) initDeps(ctx context.Context) error {
 }
 
 func (a *App) initConfig(_ context.Context) error {
-	err := config.Load(".env")
+	err := config.Load(".env.test")
 	if err != nil {
 		return err
 	}
