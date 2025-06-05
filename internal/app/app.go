@@ -2,10 +2,12 @@ package app
 
 import (
 	"context"
+	"flag"
 	descAuth "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
+	"log"
 	"log/slog"
 	"net"
 	"user/internal/closer"
@@ -67,7 +69,11 @@ func (a *App) initDeps(ctx context.Context) error {
 }
 
 func (a *App) initConfig(_ context.Context) error {
-	err := config.Load(".env.test")
+	path := a.mustPath()
+	err := config.Load(path)
+
+	log.Println("initConfig with ", "path: ", path)
+
 	if err != nil {
 		return err
 	}
@@ -115,6 +121,9 @@ func (a *App) setupLogger() {
 	env := a.serviceProvider.loggerConfig.Environment()
 
 	switch env {
+	case envTest:
+		logger.Init(slog.LevelDebug)
+
 	case envDev:
 		logger.Init(slog.LevelDebug)
 
@@ -123,5 +132,29 @@ func (a *App) setupLogger() {
 
 	default: // If env config is invalid, set prod settings by default due to security
 		logger.Init(slog.LevelInfo)
+	}
+}
+
+func (a *App) mustPath() string {
+	env := flag.String(
+		"env",
+		"dev",
+		"environment",
+	)
+	flag.Parse()
+
+	if *env == "" {
+		*env = envDev
+	}
+
+	switch *env {
+	case envTest:
+		return ".env.test"
+	case envDev:
+		return ".env"
+	case envProd:
+		return ".env.prod"
+	default:
+		return ".env"
 	}
 }

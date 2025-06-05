@@ -1,4 +1,4 @@
-- id: RAW=uuid_generate_v4()
+- id: d37323b3-0214-4378-adb8-a7e2da86ae55
   username: Alan
   email: test@test.com
   avatar_path: ""
@@ -9,11 +9,23 @@
   created_at: 2020-12-31 23:59:59
   updated_at: 2020-12-31 23:59:59
 
-- id: RAW=uuid_generate_v4()
+- id: 529781b9-b685-4c43-8ab7-0a8c6c04ba5f
   username: Bob
   email: bob@test.com
   avatar_path: ""
   bio: Some bio of BOB
+  is_verified: false
+  is_public: true
+  experience_level: 1
+  created_at: 2020-12-31 23:59:59
+  updated_at: 2020-12-31 23:59:59
+
+
+- id: ba1be710-3a6d-47e3-8353-36560058671f
+  username: Karl
+  email: karl@test.com
+  avatar_path: ""
+  bio: Some bio of Karl
   is_verified: false
   is_public: true
   experience_level: 1

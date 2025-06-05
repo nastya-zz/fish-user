@@ -23,8 +23,8 @@ func (r repo) Unsubscribe(ctx context.Context, id model.UserId, subscriptionId m
 
 	builder := sq.Delete(TableFollowsName).
 		Where(sq.And{
-			sq.Eq{FollowerIdColumn: userId},
-			sq.Eq{FollowingIdColumn: subsId},
+			sq.Eq{FollowerIdColumn: subsId},
+			sq.Eq{FollowingIdColumn: userId},
 		}).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar)
@@ -42,10 +42,12 @@ func (r repo) Unsubscribe(ctx context.Context, id model.UserId, subscriptionId m
 	var rowId uuid.UUID
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&rowId)
 	if err != nil {
-		logger.Warn(op, "err", err)
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil
+			logger.Error(op, "err", fmt.Errorf("В данной связке пользователей подписка не найдена userId: %s, subsId: %s", userId, subsId))
+			return fmt.Errorf("В данной связке пользователей подписка не найдена userId: %s, subsId: %s", userId, subsId)
 		}
+
+		logger.Error(op, "err", err)
 		return err
 	}
 

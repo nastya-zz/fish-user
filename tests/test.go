@@ -1,7 +1,7 @@
 package tests
 
 const (
-	UserId      = "72a9cbbc-0175-4e6c-92dd-98629b6aac41"
-	TestUserId  = "b53df791-1ce0-492d-95df-97fcbf82a6c9"
+	UserId      = "d37323b3-0214-4378-adb8-a7e2da86ae55"
+	TestUserId  = "529781b9-b685-4c43-8ab7-0a8c6c04ba5f"
 	TestUser3Id = "ba1be710-3a6d-47e3-8353-36560058671f"
 )

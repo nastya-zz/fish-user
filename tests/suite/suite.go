@@ -24,7 +24,7 @@ type Suite struct {
 
 func New(t *testing.T) (context.Context, *Suite) {
 	t.Helper()
-	t.Parallel()
+	//t.Parallel()
 
 	err := config.Load("../../.env.test")
 
@@ -49,13 +49,20 @@ func New(t *testing.T) (context.Context, *Suite) {
 		log.Fatalf("failed to create db client: %v", err)
 	}
 
+	tx, err := cl.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback() // Откат после теста
+
 	if _, err = cl.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`); err != nil {
-		log.Fatalf("failed to create uuid extension: %w", err)
+		log.Fatalf("failed to create uuid extension: %v", err)
 	}
 	fixtures, err := testfixtures.New(
 		testfixtures.Database(cl),        // You database connection
 		testfixtures.Dialect("postgres"), // Available: "postgresql", "timescaledb", "mysql", "mariadb", "sqlite" and "sqlserver"
 		testfixtures.Directory("/Users/nastya/Documents/GitHub/fish-services/user/tests/fixtures"), // The directory containing the YAML files
+		testfixtures.DangerousSkipTestDatabaseCheck(),
 	)
 
 	if err != nil {

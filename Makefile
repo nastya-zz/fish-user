@@ -1,5 +1,10 @@
 LOCAL_BIN:=$(CURDIR)/bin
 
+
+up-test-app-with_test-env:
+	make up-test-env
+	make run-app-test-env
+
 functional-tests:
 	go test ./...
 
@@ -12,3 +17,5 @@ generate-migration:
 up-test-env:
 	docker-compose -f docker-compose.test.yaml --env-file .env.test up -d --build
 
+run-app-test-env:
+	go run cmd/main.go --env=test
