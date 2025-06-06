@@ -6,7 +6,7 @@ up-test-app-with_test-env:
 	make run-app-test-env
 
 functional-tests:
-	go test ./...
+	go test ./tests/...
 
 generate:
 	make generate-migration

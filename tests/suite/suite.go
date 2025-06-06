@@ -18,13 +18,11 @@ type Suite struct {
 	*testing.T                   // Потребуется для вызова методов *testing.T внутри Suite
 	Cfg        config.GRPCConfig // Конфигурация grpc
 	UserClient desc.UserV1Client // Клиент для взаимодействия с gRPC-сервером
-	//fixtures   *testfixtures.Loader
-	dbClient db.Client
+	dbClient   db.Client
 }
 
 func New(t *testing.T) (context.Context, *Suite) {
 	t.Helper()
-	//t.Parallel()
 
 	err := config.Load("../../.env.test")
 
@@ -59,10 +57,9 @@ func New(t *testing.T) (context.Context, *Suite) {
 		log.Fatalf("failed to create uuid extension: %v", err)
 	}
 	fixtures, err := testfixtures.New(
-		testfixtures.Database(cl),        // You database connection
-		testfixtures.Dialect("postgres"), // Available: "postgresql", "timescaledb", "mysql", "mariadb", "sqlite" and "sqlserver"
+		testfixtures.Database(cl),
+		testfixtures.Dialect("postgres"),
 		testfixtures.Directory("/Users/nastya/Documents/GitHub/fish-services/user/tests/fixtures"), // The directory containing the YAML files
-		testfixtures.DangerousSkipTestDatabaseCheck(),
 	)
 
 	if err != nil {

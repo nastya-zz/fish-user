@@ -87,7 +87,11 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
-	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	if env := a.serviceProvider.loggerConfig.Environment(); env == envTest {
+		a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	} else {
+		a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	}
 
 	reflection.Register(a.grpcServer)
 

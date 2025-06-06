@@ -23,7 +23,7 @@ func TestGetUserProfile_HappyPath(t *testing.T) {
 func TestGetUserProfile_Negative(t *testing.T) {
 	ctx, st := suite.New(t)
 
-	tests := []struct {
+	testSlice := []struct {
 		name        string
 		userId      string
 		expectedErr string
@@ -40,7 +40,7 @@ func TestGetUserProfile_Negative(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range testSlice {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := st.UserClient.GetProfile(ctx, &desc.GetProfileRequest{Id: tt.userId})
 
