@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	api_errors "user/pkg/api-errors"
 	"user/tests"
 	"user/tests/suite"
 )
@@ -31,12 +32,12 @@ func TestGetUserProfile_Negative(t *testing.T) {
 		{
 			name:        "Id empty",
 			userId:      "",
-			expectedErr: "Не указан id пользователя",
+			expectedErr: api_errors.UserIdRequired,
 		},
 		{
 			name:        "User not found",
 			userId:      "not-exist-id",
-			expectedErr: "Пользователь с таким Id не найден",
+			expectedErr: api_errors.UserIdNotFound,
 		},
 	}
 

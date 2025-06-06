@@ -7,18 +7,19 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"user/internal/model"
+	api_errors "user/pkg/api-errors"
 )
 
 func (i *Implementation) UnSubscribe(ctx context.Context, req *desc.SubscribeRequest) (*emptypb.Empty, error) {
 	userId := req.GetUserId()
 	subscId := req.GetSubscriptionId()
 	if subscId == "" || userId == "" {
-		return &emptypb.Empty{}, status.Error(codes.InvalidArgument, "invalid arguments")
+		return &emptypb.Empty{}, status.Error(codes.InvalidArgument, api_errors.UserIdRequired)
 	}
 
 	err := i.subscriptionsService.Unsubscribe(ctx, model.UserId(userId), model.UserId(subscId))
 	if err != nil {
-		return &emptypb.Empty{}, status.Error(codes.Internal, "Не удалось удалить подписку")
+		return &emptypb.Empty{}, status.Error(codes.Internal, api_errors.UserUnsubscribeFailed)
 	}
 
 	return &emptypb.Empty{}, nil

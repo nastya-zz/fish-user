@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"testing"
+	api_errors "user/pkg/api-errors"
 	_test "user/tests"
 	"user/tests/suite"
 )
@@ -122,12 +123,12 @@ func TestUpdateUserProfile_Email_Negative(t *testing.T) {
 		{
 			name:        "email empty text",
 			email:       "",
-			expectedErr: "User email empty",
+			expectedErr: api_errors.UserEmailEmpty,
 		},
 		{
 			name:        "not match pattern",
 			email:       "w453 345l mkh",
-			expectedErr: "Email not match pattern",
+			expectedErr: api_errors.UserEmailNotMatchPattern,
 		},
 	}
 

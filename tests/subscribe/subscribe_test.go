@@ -4,6 +4,7 @@ import (
 	desc "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"github.com/stretchr/testify/require"
 	"testing"
+	api_errors "user/pkg/api-errors"
 	"user/tests"
 	"user/tests/suite"
 )
@@ -39,7 +40,7 @@ func TestSubscribe(t *testing.T) {
 		})
 
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "user and subscription cannot be the same")
+		require.Contains(t, err.Error(), api_errors.UserSubscribeCannotBeSame)
 	})
 
 	t.Run(" user id is empty", func(t *testing.T) {
@@ -52,7 +53,7 @@ func TestSubscribe(t *testing.T) {
 		})
 
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "invalid arguments")
+		require.Contains(t, err.Error(), api_errors.UserIdRequired)
 	})
 
 	t.Run(" user id is empty", func(t *testing.T) {
@@ -65,6 +66,6 @@ func TestSubscribe(t *testing.T) {
 		})
 
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "invalid arguments")
+		require.Contains(t, err.Error(), api_errors.UserIdRequired)
 	})
 }

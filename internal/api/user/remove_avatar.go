@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"user/internal/logger"
 	"user/internal/model"
+	api_errors "user/pkg/api-errors"
 )
 
 func (i *Implementation) RemoveAvatar(ctx context.Context, req *desc.RemoveAvatarRequest) (*emptypb.Empty, error) {
@@ -15,18 +16,18 @@ func (i *Implementation) RemoveAvatar(ctx context.Context, req *desc.RemoveAvata
 
 	userId := req.GetUserId()
 	if len(userId) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "user id is required")
+		return nil, status.Error(codes.InvalidArgument, api_errors.UserIdRequired)
 	}
 
 	filename := req.GetFilename()
 	if len(filename) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "filename is required")
+		return nil, status.Error(codes.InvalidArgument, api_errors.UserAvatarFilenameEmpty)
 	}
 
 	err := i.userService.RemoveAvatar(ctx, model.UserId(userId), filename)
 	if err != nil {
-		logger.Warn(op, "err", err.Error())
-		return nil, status.Error(codes.Internal, "cannot remove avatar")
+		logger.Error(op, "err", err.Error())
+		return nil, status.Error(codes.Internal, api_errors.UserAvatarRemoveFailed)
 	}
 
 	return &emptypb.Empty{}, nil

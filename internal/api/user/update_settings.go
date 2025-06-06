@@ -7,23 +7,20 @@ import (
 	"google.golang.org/grpc/status"
 	"user/internal/converter"
 	"user/internal/model"
+	api_errors "user/pkg/api-errors"
 )
 
 func (i *Implementation) UpdateSettings(ctx context.Context, req *desc.UpdateSettingsRequest) (*desc.UpdateSettingsResponse, error) {
 	userId := req.GetUserId()
 	if len(userId) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "user id is required")
-	}
-
-	if req.GetSettingsInfo() == nil {
-		return nil, status.Error(codes.InvalidArgument, "missing user settings")
+		return nil, status.Error(codes.InvalidArgument, api_errors.UserIdRequired)
 	}
 
 	setInfo := mappingSettings(req.GetSettingsInfo())
 
 	updated, err := i.settingsService.Update(ctx, model.UserId(userId), setInfo)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to update user settings")
+		return nil, status.Error(codes.Internal, api_errors.UserUpdateSettingsFailed)
 	}
 
 	return &desc.UpdateSettingsResponse{

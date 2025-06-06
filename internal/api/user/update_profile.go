@@ -9,6 +9,7 @@ import (
 	"user/internal/converter"
 	"user/internal/logger"
 	"user/internal/model"
+	api_errors "user/pkg/api-errors"
 )
 
 func (i *Implementation) UpdateProfile(ctx context.Context, req *desc.UpdateProfileRequest) (*desc.UpdateProfileResponse, error) {
@@ -16,19 +17,19 @@ func (i *Implementation) UpdateProfile(ctx context.Context, req *desc.UpdateProf
 	info := req.GetInfo()
 
 	if len(info.GetId()) == 0 {
-		return nil, status.Error(codes.FailedPrecondition, "User ID empty")
+		return nil, status.Error(codes.InvalidArgument, api_errors.UserIdRequired)
 	}
 
 	if len(info.Email.Value) == 0 {
-		return nil, status.Error(codes.FailedPrecondition, "User email empty")
+		return nil, status.Error(codes.InvalidArgument, api_errors.UserEmailEmpty)
 	} else if checkEmailPattern(info.Email.Value) {
-		return nil, status.Error(codes.FailedPrecondition, "Email not match pattern")
+		return nil, status.Error(codes.InvalidArgument, api_errors.UserEmailNotMatchPattern)
 	}
 
 	profile, err := i.userService.UpdateProfile(ctx, mappingUpdateProfile(info))
 
 	if err != nil {
-		return nil, status.Error(codes.Internal, "Cannot update profile")
+		return nil, status.Error(codes.Internal, api_errors.UserUpdateFailed)
 	}
 
 	logger.Info(op, "updating user ", profile)

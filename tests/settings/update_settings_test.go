@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	apierrors "user/pkg/api-errors"
 	_test "user/tests"
 	"user/tests/suite"
 )
@@ -44,7 +45,37 @@ func TestUpdateSettings(t *testing.T) {
 		})
 
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "user id is required")
+		require.Contains(t, err.Error(), apierrors.UserIdRequired)
+	})
+
+	t.Run("negative update settings user id not found", func(t *testing.T) {
+		_, err := st.UserClient.UpdateSettings(ctx, &desc.UpdateSettingsRequest{
+			UserId: "29784237xx",
+			SettingsInfo: &desc.AccountSettings{
+				Language:     desc.Language_RU,
+				Availability: desc.Availability_PRIVATE,
+			},
+		})
+
+		require.Error(t, err)
+		require.Contains(t, err.Error(), apierrors.UserUpdateSettingsFailed)
+	})
+
+	t.Run("success reset settings user ", func(t *testing.T) {
+		_, err := st.UserClient.ResetSettings(ctx, &desc.ResetSettingsRequest{
+			UserId: _test.UserId,
+		})
+
+		require.NoError(t, err)
+	})
+
+	t.Run("negative reset settings user ", func(t *testing.T) {
+		_, err := st.UserClient.ResetSettings(ctx, &desc.ResetSettingsRequest{
+			UserId: "ldjkfsljfi",
+		})
+
+		require.Error(t, err)
+		require.Contains(t, err.Error(), apierrors.UserUpdateSettingsFailed)
 	})
 }
 

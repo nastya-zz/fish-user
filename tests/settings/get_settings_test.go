@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	api_errors "user/pkg/api-errors"
 	_test "user/tests"
 	"user/tests/suite"
 )
@@ -27,14 +28,14 @@ func TestGetUserSettings(t *testing.T) {
 		_, err := st.UserClient.GetSettings(ctx, &desc.GetSettingsRequest{Id: ""})
 
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "missing user id")
+		require.Contains(t, err.Error(), api_errors.UserIdRequired)
 	})
 
 	t.Run("negative get settings userId is not exist", func(t *testing.T) {
 		_, err := st.UserClient.GetSettings(ctx, &desc.GetSettingsRequest{Id: "jk34jh5g3"})
 
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "failed to get user settings")
+		require.Contains(t, err.Error(), api_errors.UserGetSettingsFailed)
 	})
 
 }

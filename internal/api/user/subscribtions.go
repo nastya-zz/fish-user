@@ -7,13 +7,14 @@ import (
 	"google.golang.org/grpc/status"
 	"user/internal/logger"
 	"user/internal/model"
+	api_errors "user/pkg/api-errors"
 )
 
 func (i *Implementation) GetSubscriptions(ctx context.Context, req *desc.GetSubscriptionsRequest) (*desc.GetSubscriptionsResponse, error) {
 	const op = "api.GetSubscriptions"
 	id := req.GetId()
 	if len(id) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "missing user id")
+		return nil, status.Error(codes.InvalidArgument, api_errors.UserIdRequired)
 	}
 
 	subs, err := i.subscriptionsService.Subscriptions(ctx, model.UserId(id))
@@ -21,18 +22,15 @@ func (i *Implementation) GetSubscriptions(ctx context.Context, req *desc.GetSubs
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	logger.Info(op, "subscriptions:", subs)
+	logger.Debug(op, "subscriptions:", subs)
 
 	return &desc.GetSubscriptionsResponse{
 		Subscriptions: mapping(subs.Subscriptions),
 		Subscribers:   mapping(subs.Subscribers),
 	}, nil
-
 }
 
 func mapping(sb []model.Subscription) []*desc.SubscriptionUser {
-	logger.Debug("mapping %d", len(sb))
-
 	if len(sb) == 0 {
 		return []*desc.SubscriptionUser{}
 	}
@@ -46,7 +44,6 @@ func mapping(sb []model.Subscription) []*desc.SubscriptionUser {
 			AvatarPath: element.AvatarPath,
 		})
 	}
-	logger.Debug("slice %d", len(slice))
 
 	return slice
 }

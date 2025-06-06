@@ -8,19 +8,20 @@ import (
 	"google.golang.org/grpc/status"
 	"user/internal/converter"
 	"user/internal/model"
+	api_errors "user/pkg/api-errors"
 )
 
 func (i *Implementation) GetProfile(ctx context.Context, req *desc.GetProfileRequest) (*desc.GetProfileResponse, error) {
 	id := req.GetId()
 	if id == "" || id == uuid.Nil.String() {
-		return nil, status.Error(codes.InvalidArgument, "Не указан id пользователя")
+		return nil, status.Error(codes.InvalidArgument, api_errors.UserIdRequired)
 	}
 
 	uId, _ := uuid.Parse(id)
 
 	profile, err := i.userService.UserProfile(ctx, model.UserId(uId.String()))
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "Пользователь с таким Id не найден")
+		return nil, status.Error(codes.NotFound, api_errors.UserIdNotFound)
 	}
 
 	return &desc.GetProfileResponse{Profile: converter.ToDescProfileFromProfile(profile)}, nil

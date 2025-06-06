@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"testing"
+	api_errors "user/pkg/api-errors"
 	_test "user/tests"
 	"user/tests/suite"
 )
@@ -65,18 +66,18 @@ func TestRemoveAvatar_Negative(t *testing.T) {
 			name:        "user id is required",
 			userId:      "",
 			filename:    "345345",
-			expectedErr: "user id is required",
+			expectedErr: api_errors.UserIdRequired,
 		},
 		{
 			name:        "filename empty text",
 			userId:      _test.UserId,
-			expectedErr: "filename is required",
+			expectedErr: api_errors.UserAvatarFilenameEmpty,
 		},
 		{
 			name:        "filename not exist",
 			userId:      _test.UserId,
 			filename:    "w453 345l mkh",
-			expectedErr: "cannot remove avatar",
+			expectedErr: api_errors.UserAvatarRemoveFailed,
 		},
 	}
 

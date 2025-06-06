@@ -4,6 +4,7 @@ import (
 	desc "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"github.com/stretchr/testify/require"
 	"testing"
+	api_errors "user/pkg/api-errors"
 	"user/tests"
 	"user/tests/suite"
 )
@@ -39,6 +40,6 @@ func TestUnsubscribe(t *testing.T) {
 		})
 
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "Не удалось удалить подписку")
+		require.Contains(t, err.Error(), api_errors.UserUnsubscribeFailed)
 	})
 }
