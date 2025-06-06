@@ -72,6 +72,10 @@ func New(t *testing.T) (context.Context, *Suite) {
 
 	t.Cleanup(func() {
 		t.Helper()
+		err = cleanTables(cl)
+		if err != nil {
+			t.Fatalf("failed to drop data in tables: %v", err)
+		}
 		cancelCtx()
 	})
 
@@ -87,4 +91,17 @@ func New(t *testing.T) (context.Context, *Suite) {
 		Cfg:        cfg,
 		UserClient: desc.NewUserV1Client(cc),
 	}
+}
+
+func cleanTables(cl *sql.DB) error {
+	cleanupQuery := `
+					TRUNCATE TABLE users CASCADE;
+					TRUNCATE TABLE settings CASCADE;
+					TRUNCATE TABLE follows CASCADE;
+					TRUNCATE TABLE user_blocks CASCADE;
+					`
+	if _, err := cl.Exec(cleanupQuery); err != nil {
+		return err
+	}
+	return nil
 }
