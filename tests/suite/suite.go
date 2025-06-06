@@ -2,10 +2,15 @@ package suite
 
 import (
 	"context"
+	"database/sql"
+	"github.com/go-testfixtures/testfixtures/v3"
+	_ "github.com/lib/pq"
 	desc "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"log"
 	"testing"
+	"user/internal/client/db"
 	"user/internal/config"
 )
 
@@ -13,13 +18,14 @@ type Suite struct {
 	*testing.T                   // Потребуется для вызова методов *testing.T внутри Suite
 	Cfg        config.GRPCConfig // Конфигурация grpc
 	UserClient desc.UserV1Client // Клиент для взаимодействия с gRPC-сервером
+	dbClient   db.Client
 }
 
 func New(t *testing.T) (context.Context, *Suite) {
 	t.Helper()
-	t.Parallel()
 
-	err := config.Load("../../.env")
+	err := config.Load("../../.env.test")
+
 	if err != nil {
 		t.Fatalf("grpc server read config failed: %v", err)
 	}
@@ -30,8 +36,46 @@ func New(t *testing.T) (context.Context, *Suite) {
 
 	ctx, cancelCtx := context.WithTimeout(context.Background(), cfg.Timeout())
 
+	dbConfig, err := config.NewPGConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cl, err := sql.Open("postgres", dbConfig.DSN())
+
+	if err != nil {
+		log.Fatalf("failed to create db client: %v", err)
+	}
+
+	tx, err := cl.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback() // Откат после теста
+
+	if _, err = cl.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`); err != nil {
+		log.Fatalf("failed to create uuid extension: %v", err)
+	}
+	fixtures, err := testfixtures.New(
+		testfixtures.Database(cl),
+		testfixtures.Dialect("postgres"),
+		testfixtures.Directory("/Users/nastya/Documents/GitHub/fish-services/user/tests/fixtures"), // The directory containing the YAML files
+	)
+
+	if err != nil {
+		log.Fatalf("failed to create fixtures: %v, %s", err, dbConfig.DSN())
+	}
+
+	if err = fixtures.Load(); err != nil {
+		log.Fatalf("failed to load fixtures: %v", err)
+	}
+
 	t.Cleanup(func() {
 		t.Helper()
+		err = cleanTables(cl)
+		if err != nil {
+			t.Fatalf("failed to drop data in tables: %v", err)
+		}
 		cancelCtx()
 	})
 
@@ -47,4 +91,17 @@ func New(t *testing.T) (context.Context, *Suite) {
 		Cfg:        cfg,
 		UserClient: desc.NewUserV1Client(cc),
 	}
+}
+
+func cleanTables(cl *sql.DB) error {
+	cleanupQuery := `
+					TRUNCATE TABLE users CASCADE;
+					TRUNCATE TABLE settings CASCADE;
+					TRUNCATE TABLE follows CASCADE;
+					TRUNCATE TABLE user_blocks CASCADE;
+					`
+	if _, err := cl.Exec(cleanupQuery); err != nil {
+		return err
+	}
+	return nil
 }

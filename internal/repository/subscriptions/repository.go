@@ -13,8 +13,8 @@ const (
 	TableFollowsName = "follows"
 
 	IdColumn          = "id"
-	FollowerIdColumn  = "follower_id"
-	FollowingIdColumn = "following_id"
+	FollowerIdColumn  = "follower_id"  //последователь, подписчик
+	FollowingIdColumn = "following_id" // тот на которого подписан
 	StatusColumn      = "status"
 	CreatedAtColumn   = "created_at"
 	UpdatedAtColumn   = "updated_at"

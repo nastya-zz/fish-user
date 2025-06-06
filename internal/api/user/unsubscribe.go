@@ -18,7 +18,7 @@ func (i *Implementation) UnSubscribe(ctx context.Context, req *desc.SubscribeReq
 
 	err := i.subscriptionsService.Unsubscribe(ctx, model.UserId(userId), model.UserId(subscId))
 	if err != nil {
-		return &emptypb.Empty{}, status.Error(codes.Internal, err.Error())
+		return &emptypb.Empty{}, status.Error(codes.Internal, "Не удалось удалить подписку")
 	}
 
 	return &emptypb.Empty{}, nil
