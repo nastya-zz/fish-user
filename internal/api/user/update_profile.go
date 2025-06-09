@@ -13,6 +13,7 @@ import (
 )
 
 func (i *Implementation) UpdateProfile(ctx context.Context, req *desc.UpdateProfileRequest) (*desc.UpdateProfileResponse, error) {
+	//todo убрать из обновления имя и емейл, надо получать их из сервис auth
 	const op = "api.user.UpdateProfile"
 	info := req.GetInfo()
 
