@@ -10,7 +10,7 @@ type UserRepository interface {
 	UserProfile(ctx context.Context, id model.UserId) (*model.Profile, error)
 	UpdateProfile(ctx context.Context, updateInfo *model.UpdateProfile) (*model.Profile, error)
 	BlockUser(ctx context.Context, id model.UserId) (string, error)
-	DeleteUser(ctx context.Context, id model.UserId) error
+	//DeleteUser(ctx context.Context, id model.UserId) error
 }
 
 type SettingsRepository interface {

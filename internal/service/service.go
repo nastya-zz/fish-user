@@ -11,8 +11,8 @@ type UserService interface {
 	UpdateProfile(ctx context.Context, updateInfo *model.UpdateProfile) (*model.Profile, error)
 	UploadAvatar(ctx context.Context, file []byte, name string, userId model.UserId) (string, error)
 	RemoveAvatar(ctx context.Context, userId model.UserId, filename string) error
-	BlockUser(ctx context.Context, id model.UserId) error
-	DeleteUser(ctx context.Context, id model.UserId) error
+	//BlockUser(ctx context.Context, id model.UserId) error
+	//DeleteUser(ctx context.Context, id model.UserId) error
 }
 
 type SettingsService interface {
