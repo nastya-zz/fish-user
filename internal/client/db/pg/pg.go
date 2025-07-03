@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"user/internal/client/db"
 	"user/internal/client/db/prettier"
-	"user/internal/logger"
+	"user/pkg/logger"
 )
 
 type key string

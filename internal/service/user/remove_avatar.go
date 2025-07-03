@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 )
 

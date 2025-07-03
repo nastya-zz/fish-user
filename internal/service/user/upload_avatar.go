@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"path/filepath"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 )
 

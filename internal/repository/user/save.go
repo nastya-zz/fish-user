@@ -6,7 +6,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	pgx "github.com/jackc/pgx/v4"
 	"user/internal/client/db"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 )
 

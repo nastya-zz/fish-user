@@ -9,8 +9,8 @@ import (
 	"user/internal/model"
 )
 
-func (r repo) BlockUser(ctx context.Context, id model.UserId) (string, error) {
-	const op = "user.Repository.BlockUser"
+func (r repo) Delete(ctx context.Context, id model.UserId) (string, error) {
+	const op = "user.Repository.Delete"
 
 	builder := sq.Delete("users").Where(sq.Eq{"id": id}).Suffix("RETURNING id")
 

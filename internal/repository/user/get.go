@@ -5,7 +5,7 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"user/internal/client/db"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 )
 

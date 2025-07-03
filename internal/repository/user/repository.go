@@ -1,7 +1,9 @@
 package user
 
 import (
+	"context"
 	"user/internal/client/db"
+	"user/internal/model"
 	"user/internal/repository"
 )
 
@@ -39,4 +41,9 @@ type repo struct {
 
 func NewRepository(db db.Client) repository.UserRepository {
 	return &repo{db: db}
+}
+
+// DeleteUser implements repository.UserRepository.
+func (r *repo) DeleteUser(ctx context.Context, id model.UserId) error {
+	panic("unimplemented")
 }

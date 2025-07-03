@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/status"
 	"strings"
 	"user/internal/converter"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 	api_errors "user/pkg/api-errors"
 )

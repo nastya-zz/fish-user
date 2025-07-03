@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 	"user/internal/consumer"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 	"user/internal/service"
 )
