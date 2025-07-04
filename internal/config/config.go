@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+const env = "ENV"
+
 func Load(path string) error {
 	err := godotenv.Load(path)
 	if err != nil {

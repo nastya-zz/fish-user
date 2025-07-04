@@ -5,7 +5,7 @@ import (
 	desc "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 	api_errors "user/pkg/api-errors"
 )

@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 	api_errors "user/pkg/api-errors"
 )

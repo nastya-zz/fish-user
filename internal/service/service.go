@@ -9,10 +9,11 @@ type UserService interface {
 	SaveUser(context.Context, *model.Profile) (model.UserId, error)
 	UserProfile(ctx context.Context, id model.UserId) (*model.Profile, error)
 	UpdateProfile(ctx context.Context, updateInfo *model.UpdateProfile) (*model.Profile, error)
+	UpdateInfo(ctx context.Context, updateInfo *model.UpdateUser) error
 	UploadAvatar(ctx context.Context, file []byte, name string, userId model.UserId) (string, error)
 	RemoveAvatar(ctx context.Context, userId model.UserId, filename string) error
 	//BlockUser(ctx context.Context, id model.UserId) error
-	//DeleteUser(ctx context.Context, id model.UserId) error
+	DeleteUser(ctx context.Context, id model.UserId) error
 }
 
 type SettingsService interface {

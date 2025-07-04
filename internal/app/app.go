@@ -7,12 +7,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
-	"log"
-	"log/slog"
 	"net"
 	"user/internal/closer"
 	"user/internal/config"
-	"user/internal/logger"
+	"user/pkg/logger"
 )
 
 type App struct {
@@ -62,7 +60,6 @@ func (a *App) initDeps(ctx context.Context) error {
 		}
 	}
 
-	a.serviceProvider.LoggerConfig()
 	a.setupLogger()
 
 	return nil
@@ -72,7 +69,7 @@ func (a *App) initConfig(_ context.Context) error {
 	path := a.mustPath()
 	err := config.Load(path)
 
-	log.Println("initConfig with ", "path: ", path)
+	logger.Info("initConfig with", "path", path)
 
 	if err != nil {
 		return err
@@ -122,21 +119,9 @@ func (a *App) runEventConsumer(ctx context.Context) {
 }
 
 func (a *App) setupLogger() {
-	env := a.serviceProvider.loggerConfig.Environment()
-
-	switch env {
-	case envTest:
-		logger.Init(slog.LevelDebug)
-
-	case envDev:
-		logger.Init(slog.LevelDebug)
-
-	case envProd:
-		logger.Init(slog.LevelInfo)
-
-	default: // If env config is invalid, set prod settings by default due to security
-		logger.Init(slog.LevelInfo)
-	}
+	// Новый logger автоматически инициализируется при первом использовании
+	// Но мы можем явно вызвать Init() для настройки
+	logger.Init()
 }
 
 func (a *App) mustPath() string {

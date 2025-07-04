@@ -4,33 +4,39 @@ import (
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
-	"log"
+	"time"
 	"user/internal/client/db"
+	"user/pkg/logger"
 )
 
 type pgClient struct {
 	masterDBC db.DB
+	dbc       *pgxpool.Pool
 }
 
 func New(ctx context.Context, dsn string) (db.Client, error) {
 	dbc, err := pgxpool.Connect(ctx, dsn)
-	log.Println("Connected to database ", dsn)
+	logger.Info("Connected to database", "dsn", dsn)
 	if err != nil {
 		return nil, errors.Errorf("failed to connect to db: %v", err)
 	}
 
-	return &pgClient{
-		masterDBC: &pg{dbc: dbc},
-	}, nil
+	cl := &pgClient{
+		masterDBC: NewDB(dbc),
+		dbc:       dbc,
+	}
+	cl.StartPoolMonitoring(ctx, 10*time.Minute)
+
+	return cl, nil
 }
 
-func (c *pgClient) DB() db.DB {
-	return c.masterDBC
+func (p *pgClient) DB() db.DB {
+	return p.masterDBC
 }
 
-func (c *pgClient) Close() error {
-	if c.masterDBC != nil {
-		c.masterDBC.Close()
+func (p *pgClient) Close() error {
+	if p.masterDBC != nil {
+		p.masterDBC.Close()
 	}
 
 	return nil

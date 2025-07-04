@@ -8,10 +8,10 @@ import (
 	desc "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 	"testing"
 	"user/internal/client/db"
 	"user/internal/config"
+	"user/pkg/logger"
 )
 
 type Suite struct {
@@ -44,7 +44,7 @@ func New(t *testing.T) (context.Context, *Suite) {
 	cl, err := sql.Open("postgres", dbConfig.DSN())
 
 	if err != nil {
-		log.Fatalf("failed to create db client: %v", err)
+		logger.Fatal("failed to create db client", "error", err)
 	}
 
 	tx, err := cl.Begin()
@@ -54,7 +54,7 @@ func New(t *testing.T) (context.Context, *Suite) {
 	defer tx.Rollback() // Откат после теста
 
 	if _, err = cl.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`); err != nil {
-		log.Fatalf("failed to create uuid extension: %v", err)
+		logger.Fatal("failed to create uuid extension", "error", err)
 	}
 	fixtures, err := testfixtures.New(
 		testfixtures.Database(cl),
@@ -63,11 +63,11 @@ func New(t *testing.T) (context.Context, *Suite) {
 	)
 
 	if err != nil {
-		log.Fatalf("failed to create fixtures: %v, %s", err, dbConfig.DSN())
+		logger.Fatal("failed to create fixtures", "error", err, "dsn", dbConfig.DSN())
 	}
 
 	if err = fixtures.Load(); err != nil {
-		log.Fatalf("failed to load fixtures: %v", err)
+		logger.Fatal("failed to load fixtures", "error", err)
 	}
 
 	t.Cleanup(func() {

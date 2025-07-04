@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/minio/minio-go/v7"
 	"strings"
-	"user/internal/logger"
+	"user/pkg/logger"
 )
 
 func (s Service) RemoveFile(ctx context.Context, link string) error {

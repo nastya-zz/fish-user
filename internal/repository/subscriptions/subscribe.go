@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"user/internal/client/db"
-	"user/internal/logger"
+	"user/pkg/logger"
 	"user/internal/model"
 )
 

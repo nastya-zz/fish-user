@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log"
 	"user/internal/api/user"
 	"user/internal/client/broker"
 	"user/internal/client/broker/rabbitmq"
@@ -24,10 +23,10 @@ import (
 	sbService "user/internal/service/subscribtions"
 	userService "user/internal/service/user"
 	"user/internal/transaction"
+	"user/pkg/logger"
 )
 
 type serviceProvider struct {
-	loggerConfig config.LoggerConfig
 	pgConfig     config.PGConfig
 	grpcConfig   config.GRPCConfig
 	rmqConfig    config.RMQConfig
@@ -57,23 +56,12 @@ func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
 }
 
-func (s *serviceProvider) LoggerConfig() config.LoggerConfig {
-	if s.loggerConfig == nil {
-		cfg, err := config.NewLoggerConfig()
-		if err != nil {
-			log.Fatalf("failed to get pg config: %s", err.Error())
-		}
-
-		s.loggerConfig = cfg
-	}
-	return s.loggerConfig
-}
 
 func (s *serviceProvider) PGConfig() config.PGConfig {
 	if s.pgConfig == nil {
 		cfg, err := config.NewPGConfig()
 		if err != nil {
-			log.Fatalf("failed to get pg config: %s", err.Error())
+			logger.Fatal("failed to get pg config", "error", err.Error())
 		}
 
 		s.pgConfig = cfg
@@ -86,7 +74,7 @@ func (s *serviceProvider) RMQConfig() config.RMQConfig {
 	if s.rmqConfig == nil {
 		cfg, err := config.NewRMQConfig()
 		if err != nil {
-			log.Fatalf("failed to get rmqConfig : %s", err.Error())
+			logger.Fatal("failed to get rmqConfig", "error", err.Error())
 		}
 
 		s.rmqConfig = cfg
@@ -99,7 +87,7 @@ func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 	if s.grpcConfig == nil {
 		cfg, err := config.NewGRPCConfig()
 		if err != nil {
-			log.Fatalf("failed to get grpc config: %s", err.Error())
+			logger.Fatal("failed to get grpc config", "error", err.Error())
 		}
 
 		s.grpcConfig = cfg
@@ -112,7 +100,7 @@ func (s *serviceProvider) MinioConfig() *config.MinioConfig {
 	if s.minioConfig == nil {
 		cfg, err := config.NewMinioConfig()
 		if err != nil {
-			log.Fatalf("failed to get minio config: %s", err.Error())
+			logger.Fatal("failed to get minio config", "error", err.Error())
 		}
 
 		s.minioConfig = cfg
@@ -125,12 +113,12 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
 		cl, err := pg.New(ctx, s.PGConfig().DSN())
 		if err != nil {
-			log.Fatalf("failed to create db client: %v", err)
+			logger.Fatal("failed to create db client", "error", err)
 		}
 
 		err = cl.DB().Ping(ctx)
 		if err != nil {
-			log.Fatalf("ping error: %s", err.Error())
+			logger.Fatal("ping error", "error", err.Error())
 		}
 		closer.Add(cl.Close)
 
@@ -144,7 +132,7 @@ func (s *serviceProvider) RabbitMQClient(ctx context.Context) broker.ClientMsgBr
 	if s.rmqClient == nil {
 		cl, err := rabbitmq.NewRabbitMQ(ctx, s.RMQConfig().DSN())
 		if err != nil {
-			log.Fatalf("failed to create rmq client: %v", err)
+			logger.Fatal("failed to create rmq client", "error", err)
 		}
 
 		closer.Add(cl.Close)
@@ -160,7 +148,7 @@ func (s *serviceProvider) MinioClient(ctx context.Context) *minio.Client {
 		cfg := s.MinioConfig()
 		cl, err := minio.New(ctx, cfg.Endpoint, cfg.AccessKey, cfg.SecretKey)
 		if err != nil {
-			log.Fatalf("failed to create minio client: %v", err)
+			logger.Fatal("failed to create minio client", "error", err)
 		}
 
 		s.minioClient = cl
