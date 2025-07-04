@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
-	"log"
 	"user/internal/client/db"
+	"user/pkg/logger"
 )
 
 type pgClient struct {
@@ -14,7 +14,7 @@ type pgClient struct {
 
 func New(ctx context.Context, dsn string) (db.Client, error) {
 	dbc, err := pgxpool.Connect(ctx, dsn)
-	log.Println("Connected to database ", dsn)
+	logger.Info("Connected to database", "dsn", dsn)
 	if err != nil {
 		return nil, errors.Errorf("failed to connect to db: %v", err)
 	}
