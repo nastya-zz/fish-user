@@ -7,7 +7,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
-	"log"
 	"net"
 	"user/internal/closer"
 	"user/internal/config"
@@ -70,7 +69,7 @@ func (a *App) initConfig(_ context.Context) error {
 	path := a.mustPath()
 	err := config.Load(path)
 
-	log.Println("initConfig with ", "path: ", path)
+	logger.Info("initConfig with", "path", path)
 
 	if err != nil {
 		return err
