@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"github.com/jackc/pgconn"
+	"time"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -14,6 +15,7 @@ type Handler func(ctx context.Context) error
 type Client interface {
 	DB() DB
 	Close() error
+	StartPoolMonitoring(context.Context, time.Duration)
 }
 
 // TxManager менеджер транзакций, который выполняет указанный пользователем обработчик в транзакции

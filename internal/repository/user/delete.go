@@ -12,7 +12,11 @@ import (
 func (r repo) DeleteUser(ctx context.Context, id model.UserId) error {
 	const op = "user.Repository.Delete"
 
-	builder := sq.Delete("users").Where(sq.Eq{"id": id}).Suffix("RETURNING id")
+	uuid, err := model.GetUuid(id)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	builder := sq.Delete("users").PlaceholderFormat(sq.Dollar).Where(sq.Eq{"id": uuid})
 
 	query, args, err := builder.ToSql()
 	if err != nil {
@@ -24,8 +28,7 @@ func (r repo) DeleteUser(ctx context.Context, id model.UserId) error {
 		QueryRaw: query,
 	}
 
-	var deletedId string
-	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&deletedId)
+	_, err = r.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		logger.Error(op, "error in delete user", "err", err)
 		return fmt.Errorf("error in delete user %s,  %w", op, err)
