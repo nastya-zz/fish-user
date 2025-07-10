@@ -23,3 +23,9 @@ func NewImplementation(
 		subscriptionsService: subscriptionsService,
 	}
 }
+
+/*
+TODO:
+ - реализвать черный список для юзеров
+ - реализовать интерсептор на проверку токена
+*/
