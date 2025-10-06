@@ -3,11 +3,14 @@ package app
 import (
 	"context"
 	"flag"
+	"net"
+	"time"
+
 	descAuth "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
-	"net"
+
 	"user/internal/closer"
 	"user/internal/config"
 	"user/pkg/logger"
@@ -42,6 +45,7 @@ func (a *App) Run(ctx context.Context) error {
 	}()
 
 	a.runEventConsumer(ctx)
+	a.runEventSender(ctx)
 
 	return a.runGRPCServer()
 }
@@ -116,6 +120,10 @@ func (a *App) runGRPCServer() error {
 func (a *App) runEventConsumer(ctx context.Context) {
 	a.serviceProvider.EventConsumer(ctx)
 	a.serviceProvider.eventConsumer.Start(ctx)
+}
+
+func (a *App) runEventSender(ctx context.Context) {
+	a.serviceProvider.eventService.StartPublishEvents(ctx, 10*time.Second)
 }
 
 func (a *App) setupLogger() {

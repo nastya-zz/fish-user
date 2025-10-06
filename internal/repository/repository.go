@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"user/internal/model"
 )
 
@@ -29,7 +30,7 @@ type SubscriptionsRepository interface {
 }
 
 type EventRepository interface {
-	GetNewEvent(ctx context.Context) (*model.Event, error)
+	GetNewEvent(ctx context.Context, batchSize int) ([]*model.Event, error)
 	SaveEvent(ctx context.Context, event *model.Event) error
 	SetDone(ctx context.Context, id int) error
 }

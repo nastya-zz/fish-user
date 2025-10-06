@@ -4,18 +4,20 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"os"
 	"os/signal"
 	"syscall"
 	"user/internal/consumer"
-	"user/pkg/logger"
 	"user/internal/model"
 	"user/internal/service"
+	"user/pkg/logger"
 )
 
 const (
-	queueName = "user"
+	queueName    = "user"
+	ExchangeName = "user_events"
 )
 
 type UserConsumer struct {
@@ -23,7 +25,32 @@ type UserConsumer struct {
 	processor service.EventsService
 }
 
-func NewUserConsumer(ch *amqp.Channel, processor service.EventsService) consumer.Consumer {
+func NewUserConsumer(ch *amqp.Channel, processor service.EventsService, serviceName string) consumer.Consumer {
+
+	queue, err := ch.QueueDeclare(
+		fmt.Sprintf("%s", serviceName),
+		true,  // durable
+		false, // auto delete
+		false, // exclusive
+		false, // no wait
+		nil,   // args
+	)
+	if err != nil {
+		return nil
+	}
+
+	// Привязываем очередь к exchange
+	err = ch.QueueBind(
+		queue.Name,
+		"", // routing key не используется для fanout
+		ExchangeName,
+		false,
+		nil,
+	)
+	if err != nil {
+		return nil
+	}
+
 	return &UserConsumer{
 		ch:        ch,
 		processor: processor,

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+
 	"user/internal/api/user"
 	"user/internal/client/broker"
 	"user/internal/client/broker/rabbitmq"
@@ -13,6 +14,7 @@ import (
 	"user/internal/consumer"
 	rmqConsumer "user/internal/consumer/rabbitmq"
 	"user/internal/repository"
+	eventRepository "user/internal/repository/event"
 	"user/internal/repository/settings"
 	"user/internal/repository/subscriptions"
 	userRepository "user/internal/repository/user"
@@ -27,10 +29,10 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig     config.PGConfig
-	grpcConfig   config.GRPCConfig
-	rmqConfig    config.RMQConfig
-	minioConfig  *config.MinioConfig
+	pgConfig    config.PGConfig
+	grpcConfig  config.GRPCConfig
+	rmqConfig   config.RMQConfig
+	minioConfig *config.MinioConfig
 
 	rmqClient   broker.ClientMsgBroker
 	dbClient    db.Client
@@ -42,6 +44,7 @@ type serviceProvider struct {
 	userRepository          repository.UserRepository
 	settingsRepository      repository.SettingsRepository
 	subscriptionsRepository repository.SubscriptionsRepository
+	eventRepository         repository.EventRepository
 
 	userService          service.UserService
 	settingsService      service.SettingsService
@@ -55,7 +58,6 @@ type serviceProvider struct {
 func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
 }
-
 
 func (s *serviceProvider) PGConfig() config.PGConfig {
 	if s.pgConfig == nil {
@@ -147,7 +149,7 @@ func (s *serviceProvider) MinioClient(ctx context.Context) *minio.Client {
 	if s.minioClient == nil {
 		cfg := s.MinioConfig()
 		cl, err := minio.New(ctx, cfg.Endpoint, cfg.AccessKey, cfg.SecretKey)
-		if err != nil {
+		if err != nil || cl.Client.IsOffline() {
 			logger.Fatal("failed to create minio client", "error", err)
 		}
 
@@ -179,6 +181,13 @@ func (s *serviceProvider) SettingsRepository(ctx context.Context) repository.Set
 
 	return s.settingsRepository
 }
+func (s *serviceProvider) EventRepository(ctx context.Context) repository.EventRepository {
+	if s.eventRepository == nil {
+		s.eventRepository = eventRepository.NewRepository(s.DBClient(ctx))
+	}
+
+	return s.eventRepository
+}
 func (s *serviceProvider) SubscriptionsRepository(ctx context.Context) repository.SubscriptionsRepository {
 	if s.subscriptionsRepository == nil {
 		s.subscriptionsRepository = subscriptions.NewRepository(s.DBClient(ctx))
@@ -204,6 +213,7 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 			s.SettingsService(ctx),
 			s.TxManager(ctx),
 			s.MinioService(ctx),
+			s.EventRepository(ctx),
 		)
 	}
 
@@ -234,6 +244,8 @@ func (s *serviceProvider) EventService(ctx context.Context) service.EventsServic
 	if s.eventService == nil {
 		s.eventService = event.New(
 			s.UserService(ctx),
+			s.EventRepository(ctx),
+			s.RabbitMQClient(ctx).Connect().Channel,
 		)
 	}
 
@@ -243,7 +255,7 @@ func (s *serviceProvider) EventService(ctx context.Context) service.EventsServic
 func (s *serviceProvider) EventConsumer(ctx context.Context) consumer.Consumer {
 	if s.eventConsumer == nil {
 		r := s.RabbitMQClient(ctx)
-		s.eventConsumer = rmqConsumer.NewUserConsumer(r.Connect().Channel, s.EventService(ctx))
+		s.eventConsumer = rmqConsumer.NewUserConsumer(r.Connect().Channel, s.EventService(ctx), "user")
 	}
 	return s.eventConsumer
 }

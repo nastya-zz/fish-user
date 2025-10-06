@@ -1,9 +1,10 @@
 package model
 
 import (
-	"github.com/google/uuid"
 	"reflect"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type UserId string
@@ -21,11 +22,11 @@ type Profile struct {
 }
 
 type UpdateProfile struct {
-	ID         UserId
-	Name       string
-	AvatarPath string
-	Bio        string
-	IsPublic   bool
+	ID         UserId `json:"id"`
+	Name       string `json:"name"`
+	AvatarPath string `json:"avatar_path"`
+	Bio        string `json:"bio"`
+	IsPublic   bool   `json:"is_public"`
 }
 
 type UpdateUser struct {

@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"user/internal/model"
 )
 
@@ -30,6 +32,8 @@ type SubscriptionsService interface {
 }
 
 type EventsService interface {
+	StartPublishEvents(ctx context.Context, handlePeriod time.Duration)
+	//SendEvent(ctx context.Context, event *model.Event) error
 	Process(ctx context.Context, event model.Event) error
 }
 

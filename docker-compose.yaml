@@ -35,3 +35,21 @@ services:
     restart: on-failure
     environment:
       DB_HOST: pg
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    environment:
+      DB_HOST: pg
+      PG_DSN: "postgres://${PG_USER}:${PG_PASSWORD}@pg:5432/${PG_DATABASE_NAME}?sslmode=disable"
+      MINIO_DSN: "minio:9000"
+      MINIO_USER_SERVICE_ACCESS_KEY: "${MINIO_USER_SERVICE_ACCESS_KEY}"
+      MINIO_USER_SERVICE_SECRET_KEY: "${MINIO_USER_SERVICE_SECRET_KEY}"
+      RMQ_DSN: "amqp://${RMQ_USER}:${RMQ_PASSWORD}@host.docker.internal:5672/"
+    depends_on:
+      - pg
+      - minio

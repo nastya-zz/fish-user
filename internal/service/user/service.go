@@ -11,6 +11,7 @@ type serv struct {
 	settingsService service.SettingsService
 	txManager       db.TxManager
 	minio           service.MinioService
+	eventRepository repository.EventRepository
 }
 
 func NewService(
@@ -18,11 +19,13 @@ func NewService(
 	settingsService service.SettingsService,
 	txManager db.TxManager,
 	minio service.MinioService,
+	eventRepository repository.EventRepository,
 ) service.UserService {
 	return &serv{
 		userRepository:  userRepository,
 		settingsService: settingsService,
 		txManager:       txManager,
 		minio:           minio,
+		eventRepository: eventRepository,
 	}
 }

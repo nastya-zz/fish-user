@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"user/internal/converter"
 	"user/internal/model"
 	"user/pkg/logger"
@@ -12,13 +13,15 @@ import (
 var ErrUnknownEventType = errors.New("Process.UnknownEventType")
 var ErrNotImplementedEventType = errors.New("Process.NotImplementedEventType")
 
-func (p Processor) Process(ctx context.Context, event model.Event) error {
+func (p eventService) Process(ctx context.Context, event model.Event) error {
 	const op = "process.Process"
+
+	logger.Info(op, "event", event)
 	switch event.Type {
 
 	case model.UserCreate:
 		user := converter.UserFromPayload(event.Payload)
-		_, err := p.userService.SaveUser(ctx, &user)
+		_, err := p.processor.userService.SaveUser(ctx, &user)
 		if err != nil {
 			logger.Error(op, "event", model.UserCreate, "err", err)
 		}
@@ -29,16 +32,16 @@ func (p Processor) Process(ctx context.Context, event model.Event) error {
 		userForUpdate := converter.UpdateUserFromPayload(event.Payload)
 		logger.Info(op, "event", model.UserUpdate, "payload", event.Payload, "userForUpdate", userForUpdate)
 
-		err := p.userService.UpdateInfo(ctx, &userForUpdate)
+		err := p.processor.userService.UpdateInfo(ctx, &userForUpdate)
 		if err != nil {
 			logger.Error(op, "event", model.UserUpdate, "err", err)
 		}
 
 	case model.UserDelete:
 		user := converter.UserFromPayload(event.Payload)
-		logger.Info(op, "event", model.UserUpdate, "payload", event.Payload, "user", user)
+		logger.Info(op, "event", model.UserDelete, "payload", event.Payload, "user", user)
 
-		err := p.userService.DeleteUser(ctx, user.ID)
+		err := p.processor.userService.DeleteUser(ctx, user.ID)
 		if err != nil {
 			logger.Error(op, "event", model.UserUpdate, "err", err)
 		}
