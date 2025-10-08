@@ -2,14 +2,18 @@ package user
 
 import (
 	"context"
+	"strings"
+
+	"github.com/google/uuid"
 	desc "github.com/nastya-zz/fisher-protocols/gen/user_v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"strings"
+
 	"user/internal/converter"
-	"user/pkg/logger"
 	"user/internal/model"
+	"user/internal/utils"
 	api_errors "user/pkg/api-errors"
+	"user/pkg/logger"
 )
 
 func (i *Implementation) UpdateProfile(ctx context.Context, req *desc.UpdateProfileRequest) (*desc.UpdateProfileResponse, error) {
@@ -17,8 +21,9 @@ func (i *Implementation) UpdateProfile(ctx context.Context, req *desc.UpdateProf
 	const op = "api.user.UpdateProfile"
 	info := req.GetInfo()
 
-	if len(info.GetId()) == 0 {
-		return nil, status.Error(codes.InvalidArgument, api_errors.UserIdRequired)
+	userID, err := utils.GetUserIdFromMetadata(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if len(info.Email.Value) == 0 {
@@ -27,7 +32,7 @@ func (i *Implementation) UpdateProfile(ctx context.Context, req *desc.UpdateProf
 		return nil, status.Error(codes.InvalidArgument, api_errors.UserEmailNotMatchPattern)
 	}
 
-	profile, err := i.userService.UpdateProfile(ctx, mappingUpdateProfile(info))
+	profile, err := i.userService.UpdateProfile(ctx, mappingUpdateProfile(info, userID))
 
 	if err != nil {
 		return nil, status.Error(codes.Internal, api_errors.UserUpdateFailed)
@@ -38,9 +43,9 @@ func (i *Implementation) UpdateProfile(ctx context.Context, req *desc.UpdateProf
 	return &desc.UpdateProfileResponse{Profile: converter.ToDescProfileFromProfile(profile)}, nil
 }
 
-func mappingUpdateProfile(info *desc.UpdateProfile) *model.UpdateProfile {
+func mappingUpdateProfile(info *desc.UpdateProfile, userID uuid.UUID) *model.UpdateProfile {
 	return &model.UpdateProfile{
-		ID:         model.UserId(info.GetId()),
+		ID:         model.UserId(userID.String()),
 		Name:       info.Name.Value,
 		AvatarPath: info.AvatarPath.Value,
 		Bio:        info.Bio.Value,
