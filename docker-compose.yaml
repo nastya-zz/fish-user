@@ -1,22 +1,8 @@
-version: '3'
 
 volumes:
   postgres_volume:
 
 services:
-  minio:
-    image: minio/minio:RELEASE.2023-11-15T20-43-25Z
-    container_name: minio
-    ports:
-      - "${MINIO_PORT}:9000"  # API порт
-      - "${MINIO_UI_PORT}:9001"  # Web интерфейс (консоль управления)
-    volumes:
-      - /Users/nastya/Documents/GitHub/fish-services/minio_data:/data  # Хранилище данных (можно заменить на свой путь)
-    environment:
-      - "MINIO_ROOT_USER=${MINIO_ROOT_USER}"  # Логин (измените на свой)
-      - "MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}"  # Пароль (обязательно измените!)
-    command: server /data --console-address ":9001"  # Запуск сервера с консолью
-    #restart: unless-stopped  # Автоматический перезапуск
   pg:
     image: postgres:14-alpine3.17
     environment:
@@ -46,12 +32,11 @@ services:
     environment:
       DB_HOST: pg
       PG_DSN: "postgres://${PG_USER}:${PG_PASSWORD}@pg:5432/${PG_DATABASE_NAME}?sslmode=disable"
-      MINIO_DSN: "minio:9000"
+      MINIO_DSN: "${MINIO_HOST}:9000"
       MINIO_USER_SERVICE_ACCESS_KEY: "${MINIO_USER_SERVICE_ACCESS_KEY}"
       MINIO_USER_SERVICE_SECRET_KEY: "${MINIO_USER_SERVICE_SECRET_KEY}"
-      RMQ_DSN: "amqp://${RMQ_USER}:${RMQ_PASSWORD}@host.docker.internal:5672/"
+      RMQ_DSN: "amqp://${RMQ_USER}:${RMQ_PASSWORD}@${RMQ_HOST}:5672/"
       GRPC_HOST: "${GRPC_HOST}"
       GRPC_PORT: "${GRPC_PORT}"
     depends_on:
       - pg
-      - minio
