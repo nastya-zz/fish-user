@@ -234,6 +234,7 @@ func (s *serviceProvider) SubscriptionsService(ctx context.Context) service.Subs
 		s.subscriptionsService = sbService.NewService(
 			s.SubscriptionsRepository(ctx),
 			s.TxManager(ctx),
+			s.EventRepository(ctx),
 		)
 	}
 

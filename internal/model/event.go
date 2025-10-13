@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Event struct {
 	ID      int    `db:"id"`
@@ -13,6 +15,8 @@ const (
 	UserUpdate        = "user_update"
 	UserUpdateProfile = "user_update_profile"
 	UserDelete        = "user_delete"
+	UserSubscribed    = "user_subscribed"
+	UserUnsubscribed  = "user_unsubscribed"
 )
 
 type UserPayload struct {
@@ -21,4 +25,9 @@ type UserPayload struct {
 	Email      string    `json:"email"`
 	IsVerified bool      `json:"isVerified"`
 	CreatedAt  time.Time `json:"createdAt"`
+}
+
+type SubscribePayload struct {
+	FollowerID string `json:"follower_id"`
+	AuthorID   string `json:"author_id"`
 }

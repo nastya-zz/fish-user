@@ -9,6 +9,10 @@ import (
 
 type UserId string
 
+func (u UserId) String() string {
+	return string(u)
+}
+
 type Profile struct {
 	ID              UserId
 	Name            string
