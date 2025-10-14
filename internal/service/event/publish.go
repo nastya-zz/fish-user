@@ -1,9 +1,8 @@
 package event
 
 import (
-	"bytes"
 	"context"
-	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -72,20 +71,20 @@ func (s eventService) SendEvent(ctx context.Context, event *model.Event) error {
 
 func (s eventService) publish(_ context.Context, event *model.Event) error {
 	const op = "broker.publish"
-	var b bytes.Buffer
 
-	if err := gob.NewEncoder(&b).Encode(event); err != nil {
+	b, err := json.Marshal(event)
+	if err != nil {
 		return fmt.Errorf("could not encode event: %w", err)
 	}
-	err := s.sender.ch.Publish(
+	err = s.sender.ch.Publish(
 		rabbitmq.ExchangeName, // exchange
 		"",                    // routing key (не используется для fanout)
 		false,                 // mandatory
 		false,                 // immediate
 		amqp.Publishing{
 			AppId:       "auth_grpc_server",
-			ContentType: "application/x-encoding-gob",
-			Body:        b.Bytes(),
+			ContentType: "application/json",
+			Body:        b,
 			Timestamp:   time.Now(),
 		})
 	if err != nil {
